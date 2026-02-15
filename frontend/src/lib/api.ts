@@ -45,7 +45,7 @@ export async function apiFetch<T = unknown>(
     const error = await response.json().catch(() => ({
       detail: "An unexpected error occurred",
     }));
-    throw new Error(error.detail || error.message || `HTTP error ${response.status}`);
+    throw new Error(error.error || error.detail || error.message || `HTTP error ${response.status}`);
   }
 
   return response.json();
@@ -65,7 +65,7 @@ export async function login(
     const error = await response.json().catch(() => ({
       detail: "Login failed",
     }));
-    throw new Error(error.detail || error.message || "Login failed");
+    throw new Error(error.error || error.detail || error.message || "Login failed");
   }
 
   const data = await response.json();
@@ -96,7 +96,7 @@ export async function register(
     const error = await regResponse.json().catch(() => ({
       detail: "Registration failed",
     }));
-    throw new Error(error.detail || error.message || "Registration failed");
+    throw new Error(error.error || error.detail || error.message || "Registration failed");
   }
 
   // Auto-login after successful registration
