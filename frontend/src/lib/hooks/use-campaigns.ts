@@ -41,8 +41,8 @@ export interface Campaign {
 }
 
 export interface HydraCollection<T> {
-  "hydra:member": T[];
-  "hydra:totalItems": number;
+  member: T[];
+  totalItems: number;
 }
 
 export interface CreateCampaignInput {

@@ -37,7 +37,7 @@ export default function CampaignDetailPage() {
   const deleteCampaign = useDeleteCampaign();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const content = contentData?.["hydra:member"] ?? [];
+  const content = contentData?.member ?? [];
 
   const handleDelete = async () => {
     await deleteCampaign.mutateAsync(id);

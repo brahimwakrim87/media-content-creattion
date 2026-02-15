@@ -28,10 +28,10 @@ export default function DashboardPage() {
   const { data: campaignsData } = useCampaigns();
   const { data: contentData } = useContentList();
 
-  const campaigns = campaignsData?.["hydra:member"] ?? [];
-  const content = contentData?.["hydra:member"] ?? [];
-  const totalCampaigns = campaignsData?.["hydra:totalItems"] ?? 0;
-  const totalContent = contentData?.["hydra:totalItems"] ?? 0;
+  const campaigns = campaignsData?.member ?? [];
+  const content = contentData?.member ?? [];
+  const totalCampaigns = campaignsData?.totalItems ?? 0;
+  const totalContent = contentData?.totalItems ?? 0;
   const activeCampaigns = campaigns.filter((c) => c.status === "active").length;
 
   const stats = [

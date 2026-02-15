@@ -30,8 +30,8 @@ export default function NewContentPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const campaigns = campaignsData?.["hydra:member"] ?? [];
-  const tags = tagsData?.["hydra:member"] ?? [];
+  const campaigns = campaignsData?.member ?? [];
+  const tags = tagsData?.member ?? [];
 
   const {
     register,

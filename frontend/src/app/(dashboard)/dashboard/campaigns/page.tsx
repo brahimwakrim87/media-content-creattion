@@ -17,8 +17,8 @@ export default function CampaignsPage() {
   const { data, isLoading } = useCampaigns(page);
   const deleteCampaign = useDeleteCampaign();
 
-  const campaigns = data?.["hydra:member"] ?? [];
-  const totalItems = data?.["hydra:totalItems"] ?? 0;
+  const campaigns = data?.member ?? [];
+  const totalItems = data?.totalItems ?? 0;
 
   const filtered =
     statusFilter === "all"

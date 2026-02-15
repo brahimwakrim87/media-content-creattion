@@ -28,7 +28,7 @@ export default function NewCampaignPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const tags = tagsData?.["hydra:member"] ?? [];
+  const tags = tagsData?.member ?? [];
 
   const {
     register,

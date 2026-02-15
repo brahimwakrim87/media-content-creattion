@@ -38,8 +38,8 @@ export default function ContentPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const { data, isLoading } = useContentList(page);
 
-  const items = data?.["hydra:member"] ?? [];
-  const totalItems = data?.["hydra:totalItems"] ?? 0;
+  const items = data?.member ?? [];
+  const totalItems = data?.totalItems ?? 0;
 
   const filtered =
     typeFilter === "all"
