@@ -1,0 +1,163 @@
+{
+  "name": "Image Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "image-process",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate HMAC signature\nconst crypto = require('crypto');\nconst webhookSecret = $env.WEBHOOK_SECRET || 'n8n-webhook-hmac-secret-change-me';\nconst body = JSON.stringify($input.first().json);\nconst signature = $input.first().headers?.['x-webhook-signature'] || '';\nconst expected = crypto.createHmac('sha256', webhookSecret).update(body).digest('hex');\n\nif (signature !== expected) {\n  throw new Error('Invalid webhook signature');\n}\n\nreturn $input.all();"
+      },
+      "id": "validate-hmac",
+      "name": "Validate HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"processing\", \"jobId\": \"{{ $json.jobId }}\"}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [690, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst sourceUrl = data.options?.sourceUrl;\nconst jobId = data.jobId;\nconst objectId = data.objectId;\nconst outputDir = '/media';\n\nif (!sourceUrl) {\n  // No source image — just acknowledge\n  return [{ json: { jobId, objectId, status: 'failed', error: 'No sourceUrl provided in options' } }];\n}\n\nconst uuid = jobId.replace(/-/g, '').substring(0, 12);\nconst platforms = {\n  'instagram_square': { width: 1080, height: 1080 },\n  'facebook_link': { width: 1200, height: 630 },\n  'linkedin_post': { width: 1200, height: 628 },\n  'twitter_card': { width: 1200, height: 675 }\n};\n\nreturn [{ json: { jobId, objectId, sourceUrl, outputDir, uuid, platforms } }];"
+      },
+      "id": "prepare-processing",
+      "name": "Prepare Processing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 440]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.sourceUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-image",
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [910, 440]
+    },
+    {
+      "parameters": {
+        "command": "=# Save downloaded file and resize for platforms\nINPUT_FILE=\"/tmp/input_{{ $json.uuid }}.jpg\"\nOUTPUT_BASE=\"{{ $json.outputDir }}/{{ $json.uuid }}\"\n\n# Resize for Instagram (1080x1080)\nconvert \"$INPUT_FILE\" -resize 1080x1080^ -gravity center -extent 1080x1080 \"${OUTPUT_BASE}_instagram.jpg\" 2>/dev/null || true\n\n# Resize for Facebook (1200x630)\nconvert \"$INPUT_FILE\" -resize 1200x630^ -gravity center -extent 1200x630 \"${OUTPUT_BASE}_facebook.jpg\" 2>/dev/null || true\n\n# Resize for LinkedIn (1200x628)\nconvert \"$INPUT_FILE\" -resize 1200x628^ -gravity center -extent 1200x628 \"${OUTPUT_BASE}_linkedin.jpg\" 2>/dev/null || true\n\n# Copy original\ncp \"$INPUT_FILE\" \"${OUTPUT_BASE}_original.jpg\" 2>/dev/null || true\n\necho \"done\""
+      },
+      "id": "resize-images",
+      "name": "Resize Images",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1130, 440]
+    },
+    {
+      "parameters": {
+        "url": "=https://mmc.ilinqsoft.com/api/webhooks/n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Webhook-Signature",
+              "value": "={{ require('crypto').createHmac('sha256', $env.WEBHOOK_SECRET || 'n8n-webhook-hmac-secret-change-me').update(JSON.stringify({ jobId: $json.jobId, objectId: $json.objectId, status: 'completed', mediaUrl: '/media/' + $json.uuid + '_original.jpg' })).digest('hex') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "objectId",
+              "value": "={{ $json.objectId }}"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            },
+            {
+              "name": "mediaUrl",
+              "value": "=/media/{{ $json.uuid }}_original.jpg"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "callback-cms",
+      "name": "Callback to CMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1350, 440]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Validate HMAC", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Validate HMAC": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 },
+          { "node": "Prepare Processing", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Prepare Processing": {
+      "main": [
+        [
+          { "node": "Download Image", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          { "node": "Resize Images", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Resize Images": {
+      "main": [
+        [
+          { "node": "Callback to CMS", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-15T00:00:00.000Z",
+  "versionId": "1"
+}

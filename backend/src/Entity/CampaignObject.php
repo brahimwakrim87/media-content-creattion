@@ -101,9 +101,17 @@ class CampaignObject
     #[Groups(['content:read', 'campaign:item:read'])]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['content:read'])]
+    private ?array $generationMeta = null;
+
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['content:read'])]
     private \DateTimeImmutable $updatedAt;
+
+    /** @var Collection<int, GenerationJob> */
+    #[ORM\OneToMany(targetEntity: GenerationJob::class, mappedBy: 'campaignObject')]
+    private Collection $generationJobs;
 
     /** @var Collection<int, Publication> */
     #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'campaignObject', cascade: ['persist', 'remove'])]
@@ -120,6 +128,7 @@ class CampaignObject
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->generationJobs = new ArrayCollection();
         $this->publications = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
@@ -206,9 +215,45 @@ class CampaignObject
         return $this->createdAt;
     }
 
+    public function getGenerationMeta(): ?array
+    {
+        return $this->generationMeta;
+    }
+
+    public function setGenerationMeta(?array $generationMeta): static
+    {
+        $this->generationMeta = $generationMeta;
+        return $this;
+    }
+
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /** @return Collection<int, GenerationJob> */
+    public function getGenerationJobs(): Collection
+    {
+        return $this->generationJobs;
+    }
+
+    public function addGenerationJob(GenerationJob $generationJob): static
+    {
+        if (!$this->generationJobs->contains($generationJob)) {
+            $this->generationJobs->add($generationJob);
+            $generationJob->setCampaignObject($this);
+        }
+        return $this;
+    }
+
+    public function removeGenerationJob(GenerationJob $generationJob): static
+    {
+        if ($this->generationJobs->removeElement($generationJob)) {
+            if ($generationJob->getCampaignObject() === $this) {
+                $generationJob->setCampaignObject(null);
+            }
+        }
+        return $this;
     }
 
     /** @return Collection<int, Publication> */

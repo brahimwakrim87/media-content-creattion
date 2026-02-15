@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Campaign;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
+use App\Entity\GenerationJob;
 use App\Entity\Permission;
 use App\Entity\Publication;
 use App\Entity\Role;
@@ -206,6 +207,12 @@ class AppFixtures extends Fixture
         $obj2->setTitle('Launch Day Announcement');
         $obj2->setContent('Exciting news! Product X is officially here. Discover the future of innovation. #ProductX #Innovation');
         $obj2->setStatus('ready');
+        $obj2->setGenerationMeta([
+            'lastGeneratedAt' => '2026-02-10T14:35:00+00:00',
+            'provider' => 'anthropic_claude',
+            'tokensUsed' => 142,
+            'contentType' => 'post',
+        ]);
         $obj2->addTag($tags['Social Media']);
         $manager->persist($obj2);
 
@@ -331,6 +338,31 @@ class AppFixtures extends Fixture
         $pub4->setErrorMessage('Image dimensions not supported for this platform');
         $pub4->setRetryCount(2);
         $manager->persist($pub4);
+
+        // Generation jobs
+        $genJob1 = new GenerationJob();
+        $genJob1->setCampaignObject($obj2);
+        $genJob1->setRequestedBy($admin);
+        $genJob1->setProvider('anthropic_claude');
+        $genJob1->setPrompt('Write an engaging social media post announcing the launch of Product X, highlighting innovation and inviting followers to learn more.');
+        $genJob1->setOptions(['tone' => 'professional', 'length' => 'medium', 'platform' => 'general']);
+        $genJob1->setStatus('completed');
+        $genJob1->setResult('Exciting news! Product X is officially here. Discover the future of innovation. #ProductX #Innovation');
+        $genJob1->setTokensUsed(142);
+        $genJob1->setProcessingTimeMs(2350);
+        $genJob1->setCompletedAt(new \DateTimeImmutable('2026-02-10 14:35:00'));
+        $manager->persist($genJob1);
+
+        $genJob2 = new GenerationJob();
+        $genJob2->setCampaignObject($obj4);
+        $genJob2->setRequestedBy($admin);
+        $genJob2->setProvider('anthropic_claude');
+        $genJob2->setPrompt('Write a comprehensive blog article about the technology behind Product X and its impact on the industry.');
+        $genJob2->setOptions(['tone' => 'professional', 'length' => 'long', 'platform' => 'general']);
+        $genJob2->setStatus('failed');
+        $genJob2->setErrorMessage('API rate limit exceeded. Please try again later.');
+        $genJob2->setProcessingTimeMs(1200);
+        $manager->persist($genJob2);
 
         $manager->flush();
     }

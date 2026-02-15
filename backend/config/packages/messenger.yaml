@@ -21,3 +21,4 @@ framework:
         routing:
             App\Message\SendNotification: async
             App\Message\CollectAnalytics: async
+            App\Message\GenerateContent: async

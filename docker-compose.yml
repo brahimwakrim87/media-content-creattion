@@ -7,6 +7,7 @@ services:
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./backend/public:/var/www/backend/public:ro
+      - media_storage:/var/www/backend/var/storage/media:ro
     depends_on:
       php-fpm:
         condition: service_started
@@ -22,6 +23,7 @@ services:
       dockerfile: docker/php/Dockerfile
     volumes:
       - ./backend:/var/www/backend
+      - media_storage:/var/www/backend/var/storage/media
     env_file: .env.docker
     depends_on:
       postgres:
@@ -39,6 +41,7 @@ services:
     command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=128M
     volumes:
       - ./backend:/var/www/backend
+      - media_storage:/var/www/backend/var/storage/media
     env_file: .env.docker
     depends_on:
       php-fpm:
@@ -94,11 +97,14 @@ services:
       - dmcc
 
   n8n:
-    image: n8nio/n8n:latest
+    build:
+      context: .
+      dockerfile: docker/n8n/Dockerfile
     ports:
       - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
+      - media_storage:/media
     environment:
       N8N_BASIC_AUTH_ACTIVE: "true"
       N8N_BASIC_AUTH_USER: "${N8N_AUTH_USER:-admin}"
@@ -115,6 +121,7 @@ volumes:
   pg_data:
   redis_data:
   n8n_data:
+  media_storage:
 
 networks:
   dmcc:

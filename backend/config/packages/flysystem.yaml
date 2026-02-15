@@ -5,3 +5,7 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/default'
+        media.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/media'

@@ -15,6 +15,13 @@ export interface ContentItem {
   mediaUrl: string | null;
   status: "draft" | "generating" | "ready" | "approved" | "published";
   tags: Tag[];
+  generationMeta: {
+    lastGeneratedAt?: string;
+    provider?: string;
+    tokensUsed?: number;
+    contentType?: string;
+    mediaUrl?: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }

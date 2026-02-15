@@ -11,9 +11,13 @@ import {
   Image,
   Newspaper,
   Megaphone,
+  Sparkles,
 } from "lucide-react";
 import { useContentItem, useUpdateContent, useDeleteContent } from "@/lib/hooks/use-content";
 import { StatusBadge } from "@/components/status-badge";
+import { MediaPreview } from "@/components/media-preview";
+import { MediaUpload } from "@/components/media-upload";
+import { GenerationProgress } from "@/components/generation-progress";
 
 const typeIcons: Record<string, typeof Video> = {
   video: Video,
@@ -29,7 +33,7 @@ export default function ContentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { data: item, isLoading } = useContentItem(id);
+  const { data: item, isLoading, refetch } = useContentItem(id);
   const updateContent = useUpdateContent(id);
   const deleteContent = useDeleteContent();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,6 +45,15 @@ export default function ContentDetailPage() {
   const handleDelete = async () => {
     await deleteContent.mutateAsync(id);
     router.push("/dashboard/content");
+  };
+
+  const handleMediaUpload = async (result: { url: string }) => {
+    await updateContent.mutateAsync({ mediaUrl: result.url } as Parameters<typeof updateContent.mutateAsync>[0]);
+    refetch();
+  };
+
+  const handleGenerationComplete = () => {
+    refetch();
   };
 
   if (isLoading) {
@@ -100,6 +113,13 @@ export default function ContentDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href={`/dashboard/ai-studio?campaign=${item.campaign?.id}&type=${item.type}`}
+              className="flex items-center gap-1.5 rounded-lg border border-purple-300 px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-50"
+            >
+              <Sparkles className="h-4 w-4" />
+              Generate with AI
+            </Link>
             <StatusBadge status={item.status} variant="content" />
             <button
               onClick={() => setShowDeleteConfirm(true)}
@@ -110,10 +130,26 @@ export default function ContentDetailPage() {
           </div>
         </div>
 
+        {/* Generation in progress */}
+        {item.status === "generating" && (
+          <div className="mt-6 border-t pt-4">
+            <p className="mb-2 text-xs font-medium uppercase text-gray-500">
+              Generation in Progress
+            </p>
+            <GenerationProgress
+              jobId=""
+              onComplete={handleGenerationComplete}
+            />
+            <p className="mt-2 text-xs text-gray-400">
+              Check the AI Studio for detailed progress.
+            </p>
+          </div>
+        )}
+
         {/* Status flow */}
         {item.status !== "published" && item.status !== "generating" && (
           <div className="mt-6 border-t pt-4">
-            <p className="mb-2 text-xs font-medium text-gray-500 uppercase">
+            <p className="mb-2 text-xs font-medium uppercase text-gray-500">
               Change Status
             </p>
             <div className="flex gap-2">
@@ -136,7 +172,7 @@ export default function ContentDetailPage() {
         {/* Content body */}
         {item.content && (
           <div className="mt-6 border-t pt-4">
-            <h2 className="mb-2 text-sm font-medium text-gray-500 uppercase">
+            <h2 className="mb-2 text-sm font-medium uppercase text-gray-500">
               Content
             </h2>
             <div className="whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm text-gray-700">
@@ -145,27 +181,56 @@ export default function ContentDetailPage() {
           </div>
         )}
 
-        {/* Media URL */}
-        {item.mediaUrl && (
+        {/* Media */}
+        <div className="mt-4 border-t pt-4">
+          <h2 className="mb-2 text-sm font-medium uppercase text-gray-500">
+            Media
+          </h2>
+          {item.mediaUrl ? (
+            <MediaPreview url={item.mediaUrl} alt={item.title ?? undefined} />
+          ) : (
+            <MediaUpload
+              onUploadComplete={handleMediaUpload}
+              accept={
+                item.type === "video"
+                  ? "video/*"
+                  : item.type === "image"
+                    ? "image/*"
+                    : "image/*,video/*"
+              }
+            />
+          )}
+        </div>
+
+        {/* Generation metadata */}
+        {item.generationMeta && (
           <div className="mt-4 border-t pt-4">
-            <h2 className="mb-2 text-sm font-medium text-gray-500 uppercase">
-              Media
+            <h2 className="mb-2 text-sm font-medium uppercase text-gray-500">
+              AI Generation Info
             </h2>
-            <a
-              href={item.mediaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              {item.mediaUrl}
-            </a>
+            <div className="flex gap-4 text-xs text-gray-500">
+              {item.generationMeta.provider && (
+                <span>Provider: {item.generationMeta.provider}</span>
+              )}
+              {item.generationMeta.tokensUsed && (
+                <span>Tokens: {item.generationMeta.tokensUsed}</span>
+              )}
+              {item.generationMeta.lastGeneratedAt && (
+                <span>
+                  Generated:{" "}
+                  {new Date(
+                    item.generationMeta.lastGeneratedAt
+                  ).toLocaleString()}
+                </span>
+              )}
+            </div>
           </div>
         )}
 
         {/* Tags */}
         {item.tags && item.tags.length > 0 && (
           <div className="mt-4 border-t pt-4">
-            <h2 className="mb-2 text-sm font-medium text-gray-500 uppercase">
+            <h2 className="mb-2 text-sm font-medium uppercase text-gray-500">
               Tags
             </h2>
             <div className="flex flex-wrap gap-1.5">

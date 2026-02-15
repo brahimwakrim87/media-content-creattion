@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Operation;
 use App\Entity\Campaign;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
+use App\Entity\GenerationJob;
 use App\Entity\Publication;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -71,6 +72,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
             $queryBuilder->join(sprintf('%s.campaignObject', $rootAlias), 'pub_content')
                 ->join('pub_content.campaign', 'pub_campaign')
                 ->andWhere('pub_campaign.owner = :current_user')
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === GenerationJob::class) {
+            $queryBuilder->andWhere(sprintf('%s.requestedBy = :current_user', $rootAlias))
                 ->setParameter('current_user', $user);
         }
     }

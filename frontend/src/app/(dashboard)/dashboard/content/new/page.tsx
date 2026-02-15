@@ -6,10 +6,11 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { useCampaigns } from "@/lib/hooks/use-campaigns";
 import { useCreateContent } from "@/lib/hooks/use-content";
 import { useTags } from "@/lib/hooks/use-tags";
+import { MediaUpload } from "@/components/media-upload";
 
 const contentSchema = z.object({
   campaign: z.string().min(1, "Please select a campaign"),
@@ -29,6 +30,7 @@ export default function NewContentPage() {
   const { data: tagsData } = useTags();
   const [error, setError] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
 
   const campaigns = campaignsData?.member ?? [];
   const tags = tagsData?.member ?? [];
@@ -54,6 +56,7 @@ export default function NewContentPage() {
       };
       if (data.title) payload.title = data.title;
       if (data.content) payload.content = data.content;
+      if (mediaUrl) payload.mediaUrl = mediaUrl;
       if (selectedTags.length > 0) {
         payload.tags = selectedTags.map((id) => `/api/tags/${id}`);
       }
@@ -162,6 +165,18 @@ export default function NewContentPage() {
           />
         </div>
 
+        {/* Media Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Media (optional)
+          </label>
+          <div className="mt-1">
+            <MediaUpload
+              onUploadComplete={(result) => setMediaUrl(result.url)}
+            />
+          </div>
+        </div>
+
         {tags.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -203,6 +218,13 @@ export default function NewContentPage() {
             className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
           >
             Cancel
+          </Link>
+          <Link
+            href={`/dashboard/ai-studio${preselectedCampaign ? `?campaign=${preselectedCampaign}` : ""}`}
+            className="flex items-center gap-1.5 rounded-lg border border-purple-300 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm hover:bg-purple-50"
+          >
+            <Sparkles className="h-4 w-4" />
+            Generate with AI
           </Link>
         </div>
       </form>

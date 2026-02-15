@@ -1,0 +1,167 @@
+{
+  "name": "Video Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "video-process",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate HMAC signature\nconst crypto = require('crypto');\nconst webhookSecret = $env.WEBHOOK_SECRET || 'n8n-webhook-hmac-secret-change-me';\nconst body = JSON.stringify($input.first().json);\nconst signature = $input.first().headers?.['x-webhook-signature'] || '';\nconst expected = crypto.createHmac('sha256', webhookSecret).update(body).digest('hex');\n\nif (signature !== expected) {\n  throw new Error('Invalid webhook signature');\n}\n\nreturn $input.all();"
+      },
+      "id": "validate-hmac",
+      "name": "Validate HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"processing\", \"jobId\": \"{{ $json.jobId }}\"}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [690, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst sourceUrl = data.options?.sourceUrl;\nconst jobId = data.jobId;\nconst objectId = data.objectId;\nconst outputDir = '/media';\n\nif (!sourceUrl) {\n  return [{ json: { jobId, objectId, status: 'failed', error: 'No sourceUrl provided in options' } }];\n}\n\nconst uuid = jobId.replace(/-/g, '').substring(0, 12);\n\nreturn [{ json: { jobId, objectId, sourceUrl, outputDir, uuid } }];"
+      },
+      "id": "prepare-processing",
+      "name": "Prepare Processing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 440]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.sourceUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-video",
+      "name": "Download Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [910, 440]
+    },
+    {
+      "parameters": {
+        "command": "=INPUT_FILE=\"/tmp/input_{{ $json.uuid }}.mp4\"\nOUTPUT_FILE=\"{{ $json.outputDir }}/{{ $json.uuid }}.mp4\"\nTHUMB_FILE=\"{{ $json.outputDir }}/{{ $json.uuid }}_thumb.jpg\"\n\n# Transcode to H.264/AAC for web compatibility\nffmpeg -y -i \"$INPUT_FILE\" -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k -movflags +faststart \"$OUTPUT_FILE\" 2>/dev/null\n\n# Generate thumbnail at 1 second\nffmpeg -y -i \"$INPUT_FILE\" -ss 00:00:01 -frames:v 1 -q:v 2 \"$THUMB_FILE\" 2>/dev/null\n\n# Cleanup temp file\nrm -f \"$INPUT_FILE\"\n\necho \"done\""
+      },
+      "id": "process-video",
+      "name": "Process Video (FFmpeg)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1130, 440]
+    },
+    {
+      "parameters": {
+        "url": "=https://mmc.ilinqsoft.com/api/webhooks/n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Webhook-Signature",
+              "value": "={{ require('crypto').createHmac('sha256', $env.WEBHOOK_SECRET || 'n8n-webhook-hmac-secret-change-me').update(JSON.stringify({ jobId: $json.jobId, objectId: $json.objectId, status: 'completed', mediaUrl: '/media/' + $json.uuid + '.mp4', thumbnailUrl: '/media/' + $json.uuid + '_thumb.jpg' })).digest('hex') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "objectId",
+              "value": "={{ $json.objectId }}"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            },
+            {
+              "name": "mediaUrl",
+              "value": "=/media/{{ $json.uuid }}.mp4"
+            },
+            {
+              "name": "thumbnailUrl",
+              "value": "=/media/{{ $json.uuid }}_thumb.jpg"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "callback-cms",
+      "name": "Callback to CMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1350, 440]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Validate HMAC", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Validate HMAC": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 },
+          { "node": "Prepare Processing", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Prepare Processing": {
+      "main": [
+        [
+          { "node": "Download Video", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Download Video": {
+      "main": [
+        [
+          { "node": "Process Video (FFmpeg)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Process Video (FFmpeg)": {
+      "main": [
+        [
+          { "node": "Callback to CMS", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-15T00:00:00.000Z",
+  "versionId": "1"
+}
