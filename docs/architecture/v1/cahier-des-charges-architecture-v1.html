@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cahier des Charges - CMS de Gestion de Campagnes Média</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #2d3748;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h4 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 2rem;
+            border-left: 4px solid #667eea;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .intro h3 {
+            margin-top: 0;
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .vision-card {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .vision-card h4 {
+            color: #667eea;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tech-item {
+            background: #edf2f7;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .tech-item strong {
+            color: #764ba2;
+        }
+
+        .module-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .module-card h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .diagram-container {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .phase-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .phase-card h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .phase-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .phase-card li {
+            padding: 0.3rem 0;
+        }
+
+        .highlight-box {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #f6ad55;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .workflow-step {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .workflow-step h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media print {
+            nav {
+                position: static;
+            }
+
+            .diagram-container {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cahier des Charges Technique</h1>
+            <p>CMS de Gestion de Campagnes de Contenu Média Multi-Canal</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">Architecture Symfony 7 + N8N - Version 2.0</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#objectif">Objectif</a></li>
+                <li><a href="#fonctionnement">Fonctionnement</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#modules">Modules</a></li>
+                <li><a href="#n8n">N8N Integration</a></li>
+                <li><a href="#diagrammes">Diagrammes</a></li>
+                <li><a href="#implementation">Implémentation</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="objectif">
+                <h2>Objectif Principal du Projet</h2>
+
+                <div class="intro">
+                    <h3>Vision Globale</h3>
+                    <p>Développer un <strong>CMS complet de gestion de campagnes de contenu média</strong> permettant de créer, orchestrer et publier du contenu multi-format sur plusieurs canaux digitaux avec automatisation complète via N8N.</p>
+                </div>
+
+                <div class="success-box">
+                    <h4>Types d'Objets Gérés</h4>
+                    <ul class="features-list">
+                        <li><strong>Posts</strong> - Contenu social pour réseaux sociaux</li>
+                        <li><strong>Videos</strong> - Pour YouTube, TikTok, Instagram, Facebook</li>
+                        <li><strong>Articles</strong> - Pour blogs, WordPress, sites web</li>
+                        <li><strong>Images</strong> - Pour tous canaux digitaux</li>
+                        <li><strong>Advertisements</strong> - Publicités payantes (Facebook Ads, Google Ads, LinkedIn Ads)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="fonctionnement">
+                <h2>Fonctionnement Détaillé du Système</h2>
+
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>1. Création de Campagnes</h4>
+                        <p><strong>Campagnes créées au niveau CMS</strong> par les utilisateurs. Chaque campagne regroupe plusieurs objets média et est basée sur le système <strong>Topics → Tags</strong> alimenté par le sourcing.</p>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>2. Système d'Affectation Flexible</h4>
+                        <p><strong>Double niveau d'affectation :</strong></p>
+                        <ul class="features-list">
+                            <li><strong>Niveau Campagne</strong> - Affectation globale héritée par tous les objets</li>
+                            <li><strong>Niveau Objet</strong> - Override individuel pour chaque objet</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>3. Sourcing Topics → Tags</h4>
+                        <p>L'agent préconfigure des <strong>Topics</strong> (thématiques) contenant des <strong>Tags</strong> (mots-clés). Le sourcing peut être <strong>manuel</strong> (upload) ou <strong>automatique</strong> (APIs, scraping).</p>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>4. Automatisation N8N</h4>
+                        <p>Workflows automatiques pour <strong>création de contenu</strong> (vidéos, images, texte) et <strong>publication multi-plateforme</strong> (YouTube, Instagram, Facebook, TikTok, WordPress, etc.).</p>
+                    </div>
+                </div>
+
+                <h3>Flux d'Affectation Flexible</h3>
+
+                <div class="workflow-step">
+                    <h4>Affectation Niveau Campagne</h4>
+                    <p>Lors de la création d'une campagne, l'utilisateur peut :</p>
+                    <ul class="features-list">
+                        <li>Affecter la campagne complète à une liste de réseaux sociaux préconfigurés</li>
+                        <li>Sélectionner des sites web (WordPress, custom)</li>
+                        <li>Choisir des ad accounts (Facebook Ads, Google Ads)</li>
+                        <li>Tous les objets de la campagne hériteront automatiquement de ces cibles</li>
+                    </ul>
+                    <p><strong>Exemple :</strong> Campagne "Lancement Produit X" → Facebook Page A, Instagram @brand, WordPress Site, YouTube Channel</p>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>Affectation Niveau Objet (Override)</h4>
+                    <p>Pour chaque objet individuel (video, post, article, image, ad), l'utilisateur peut :</p>
+                    <ul class="features-list">
+                        <li>Conserver les cibles héritées de la campagne</li>
+                        <li>Override avec des cibles spécifiques différentes</li>
+                        <li>Ajouter des cibles supplémentaires en plus des héritées</li>
+                        <li>Retirer certaines cibles de la liste héritée</li>
+                    </ul>
+                    <p><strong>Exemple :</strong></p>
+                    <ul>
+                        <li>Video A → YouTube uniquement (override)</li>
+                        <li>Post B → Facebook + Instagram (override)</li>
+                        <li>Article C → WordPress (hérité)</li>
+                        <li>Image D → Tous réseaux sociaux + Ads (override)</li>
+                    </ul>
+                </div>
+
+                <h3>Système de Sourcing (Topics → Tags)</h3>
+
+                <div class="workflow-step">
+                    <h4>Configuration par l'Agent</h4>
+                    <p>L'agent (admin) configure la structure hiérarchique :</p>
+                    <pre>
+Topic: Technology
+├── Tag: AI
+├── Tag: Software
+└── Tag: Innovation
+
+Topic: Marketing
+├── Tag: SEO
+├── Tag: Social Media
+└── Tag: Content Strategy
+
+Topic: Lifestyle
+├── Tag: Health
+├── Tag: Travel
+└── Tag: Food
+                    </pre>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>Sourcing de Contenu</h4>
+                    <p><strong>Sourcing Manuel :</strong></p>
+                    <ul class="features-list">
+                        <li>Upload direct par l'utilisateur (drag & drop)</li>
+                        <li>Types supportés : videos, images, text, audio</li>
+                        <li>Classification automatique via IA</li>
+                    </ul>
+
+                    <p><strong>Sourcing Automatique :</strong></p>
+                    <ul class="features-list">
+                        <li>Intégration APIs externes (Unsplash, Pexels, etc.)</li>
+                        <li>Web scraping configuré</li>
+                        <li>Flux RSS automatisés</li>
+                        <li>Import en masse planifié</li>
+                    </ul>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>Utilisation dans les Campagnes</h4>
+                    <p>Le gestionnaire de campagne utilise ces données pendant la création :</p>
+                    <ul class="features-list">
+                        <li>Recherche par tags dans la bibliothèque média</li>
+                        <li>Suggestions intelligentes basées sur le topic de la campagne</li>
+                        <li>Filtrage par type de contenu (video, image, etc.)</li>
+                        <li>Sélection et association aux objets de campagne</li>
+                    </ul>
+                </div>
+
+                <h3>Comptes Préconfigurés par l'Agent</h3>
+
+                <div class="module-card">
+                    <h4>Types de Comptes Gérés</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Plateformes</th>
+                                <th>Authentification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Réseaux Sociaux</strong></td>
+                                <td>Facebook, Instagram, Twitter/X, LinkedIn, TikTok, YouTube</td>
+                                <td>OAuth2</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sites Web</strong></td>
+                                <td>WordPress, Sites Custom, CMS Propriétaires</td>
+                                <td>API Keys / Credentials</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ad Accounts</strong></td>
+                                <td>Facebook Ads, Google Ads, LinkedIn Ads, TikTok Ads</td>
+                                <td>OAuth2 + Business Manager</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Messaging</strong></td>
+                                <td>WhatsApp Business</td>
+                                <td>API Key</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="n8n">
+                <h2>Intégration N8N - Automatisation Complète</h2>
+
+                <div class="intro">
+                    <h3>Rôle de N8N dans l'Architecture</h3>
+                    <p>N8N est le moteur d'automatisation qui orchestre la <strong>création de contenu</strong> et la <strong>publication multi-plateforme</strong>. Les workflows sont déclenchés automatiquement et traitent chaque campagne ou partie de campagne en attente.</p>
+                </div>
+
+                <h3>1. Workflows de Création de Contenu</h3>
+
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>Génération de Vidéos</h4>
+                        <ul class="features-list">
+                            <li>Assemblage automatique de clips</li>
+                            <li>Montage vidéo (transitions, effets)</li>
+                            <li>Ajout de sous-titres automatiques</li>
+                            <li>Compression et formatage multi-plateforme</li>
+                            <li>Génération de thumbnails</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Traitement d'Images</h4>
+                        <ul class="features-list">
+                            <li>Redimensionnement automatique par plateforme</li>
+                            <li>Application de filtres et branding</li>
+                            <li>Ajout de watermark</li>
+                            <li>Optimisation pour le web</li>
+                            <li>Génération de variantes (carrée, paysage, portrait)</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Génération de Texte</h4>
+                        <ul class="features-list">
+                            <li>IA pour génération de posts (GPT, Claude)</li>
+                            <li>Adaptation du ton par plateforme</li>
+                            <li>Génération de hashtags pertinents</li>
+                            <li>Optimisation SEO pour articles</li>
+                            <li>Traduction multilingue</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Traitement Audio</h4>
+                        <ul class="features-list">
+                            <li>Transcription audio → texte</li>
+                            <li>Text-to-speech pour vidéos</li>
+                            <li>Nettoyage audio</li>
+                            <li>Ajout de musique de fond</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>2. Workflows de Publication Multi-Plateforme</h3>
+
+                <div class="module-card">
+                    <h4>Déclenchement des Publications</h4>
+                    <p>CMS (Symfony) → Webhook N8N → Workflow de Publication</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plateforme</th>
+                                <th>Actions N8N</th>
+                                <th>Métadonnées</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>YouTube</strong></td>
+                                <td>Upload vidéo, définir thumbnail, créer playlist</td>
+                                <td>Titre, description, tags, catégorie, visibilité</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Instagram</strong></td>
+                                <td>Post image/video, stories, reels</td>
+                                <td>Caption, hashtags, localisation, tagging</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Facebook</strong></td>
+                                <td>Publier post/video, créer événement</td>
+                                <td>Texte, liens, albums, ciblage audience</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TikTok</strong></td>
+                                <td>Upload vidéo courte, définir cover</td>
+                                <td>Description, hashtags, musique, durée</td>
+                            </tr>
+                            <tr>
+                                <td><strong>WordPress</strong></td>
+                                <td>Créer article, définir catégories</td>
+                                <td>Titre, contenu, SEO, featured image, tags</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Twitter/X</strong></td>
+                                <td>Tweet avec média, thread</td>
+                                <td>Texte (280 chars), hashtags, mentions</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LinkedIn</strong></td>
+                                <td>Post professionnel, article long-form</td>
+                                <td>Texte, document, hashtags, mentions</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ads Platforms</strong></td>
+                                <td>Créer campagne publicitaire, définir budget</td>
+                                <td>Créatif, ciblage, budget, durée, conversion</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>3. Architecture de Communication CMS ↔ N8N</h3>
+
+                <div class="workflow-step">
+                    <h4>Flux de Données</h4>
+                    <pre>
+1. CMS (Symfony) → Dispatch Message (RabbitMQ)
+2. RabbitMQ → Webhook Trigger N8N
+3. N8N → Execute Workflow
+4. N8N → Call External APIs (YouTube, Facebook, etc.)
+5. External APIs → Return Status & IDs
+6. N8N → Send Result to RabbitMQ
+7. RabbitMQ → CMS Update Database
+8. CMS → Notify User (WebSocket/Email)
+                    </pre>
+                </div>
+
+                <div class="info-box">
+                    <h4>Gestion des Erreurs & Retry</h4>
+                    <ul class="features-list">
+                        <li>Retry automatique avec backoff exponentiel (3 tentatives)</li>
+                        <li>Logs détaillés de chaque étape du workflow</li>
+                        <li>Notifications d'échec vers le CMS</li>
+                        <li>Queue de fallback pour traitement manuel</li>
+                        <li>Monitoring des workflows via dashboard N8N</li>
+                    </ul>
+                </div>
+
+                <h3>4. Workflows Analytics</h3>
+
+                <div class="workflow-step">
+                    <h4>Collecte Automatique de Métriques</h4>
+                    <p>N8N exécute des workflows planifiés pour récupérer les métriques :</p>
+                    <ul class="features-list">
+                        <li><strong>Toutes les heures</strong> : Metrics YouTube, Facebook, Instagram, TikTok</li>
+                        <li><strong>Quotidien</strong> : Google Analytics, WordPress stats</li>
+                        <li><strong>Hebdomadaire</strong> : Backlinks analysis, SEO metrics</li>
+                        <li>Normalisation et agrégation des données</li>
+                        <li>Envoi vers CMS pour stockage et affichage</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="architecture">
+                <h2>Architecture Technique Complète</h2>
+
+                <h3>Stack Technologique</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Backend Framework</strong><br>
+                        Symfony 7.x (PHP 8.2+)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Automation Engine</strong><br>
+                        N8N (Self-hosted)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Base de Données</strong><br>
+                        PostgreSQL 15+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Cache & Sessions</strong><br>
+                        Redis 7+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Message Queue</strong><br>
+                        RabbitMQ
+                    </div>
+                    <div class="tech-item">
+                        <strong>Search Engine</strong><br>
+                        Elasticsearch 8+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Storage</strong><br>
+                        S3 / MinIO
+                    </div>
+                    <div class="tech-item">
+                        <strong>API</strong><br>
+                        API Platform
+                    </div>
+                    <div class="tech-item">
+                        <strong>Web Server</strong><br>
+                        Nginx + PHP-FPM
+                    </div>
+                </div>
+
+                <h3>Architecture en Couches</h3>
+                <pre>
+Presentation Layer (Controllers/API)
+        ↓
+Application Layer (Services/Use Cases)
+        ↓
+Domain Layer (Entities/Business Logic)
+        ↓
+Infrastructure Layer (Repositories/External Services)
+        ↓
+N8N Automation Layer (Workflows)
+                </pre>
+            </section>
+
+            <section id="modules">
+                <h2>Modules Détaillés</h2>
+
+                <h3>Module 1 : Gestion Utilisateur & Sécurité</h3>
+                <div class="module-card">
+                    <ul class="features-list">
+                        <li>Authentification multi-facteurs (2FA)</li>
+                        <li>Rôles : Admin, Agent, Campaign Manager, Editor, Publisher, Viewer</li>
+                        <li>Gestion d'équipes et workspaces</li>
+                        <li>Logs d'audit complets</li>
+                        <li>API keys management</li>
+                    </ul>
+                </div>
+
+                <h3>Module 2 : Configuration des Comptes (Agent)</h3>
+                <div class="module-card">
+                    <h4>Préconfiguration par l'Agent</h4>
+                    <ul class="features-list">
+                        <li>Connexion OAuth2 aux réseaux sociaux</li>
+                        <li>Configuration WordPress API</li>
+                        <li>Setup Ad Accounts (Facebook Business Manager, Google Ads)</li>
+                        <li>Gestion des tokens et refresh automatique</li>
+                        <li>Test de connexion et validation</li>
+                    </ul>
+                </div>
+
+                <h3>Module 3 : Sourcing & Classification</h3>
+                <div class="module-card">
+                    <h4>Topics & Tags Management</h4>
+                    <ul class="features-list">
+                        <li>Création hiérarchique Topics → Tags</li>
+                        <li>Interface drag & drop pour organisation</li>
+                        <li>Import/export de taxonomie</li>
+                    </ul>
+
+                    <h4>Sourcing de Contenu</h4>
+                    <ul class="features-list">
+                        <li>Upload manuel avec drag & drop</li>
+                        <li>Connecteurs APIs (Unsplash, Pexels, Pixabay)</li>
+                        <li>Web scraping configuré</li>
+                        <li>Import RSS feeds</li>
+                        <li>Classification IA automatique (OpenAI/Claude)</li>
+                    </ul>
+
+                    <h4>Bibliothèque Média</h4>
+                    <ul class="features-list">
+                        <li>Organisation par folders et tags</li>
+                        <li>Recherche avancée (texte, tags, type, date)</li>
+                        <li>Prévisualisation inline</li>
+                        <li>Métadonnées complètes (EXIF, dimensions, durée)</li>
+                        <li>Versioning des médias</li>
+                    </ul>
+                </div>
+
+                <h3>Module 4 : Gestionnaire de Campagnes</h3>
+                <div class="module-card">
+                    <h4>Création de Campagne</h4>
+                    <ul class="features-list">
+                        <li>Wizard de création étape par étape</li>
+                        <li>Définition d'objectifs et KPIs</li>
+                        <li>Sélection de topics & tags</li>
+                        <li>Budget et timeline</li>
+                        <li>Affectation des cibles (niveau campagne)</li>
+                    </ul>
+
+                    <h4>Création d'Objets</h4>
+                    <ul class="features-list">
+                        <li>Créer Video, Post, Article, Image, Advertisement</li>
+                        <li>Sélection de médias depuis la bibliothèque</li>
+                        <li>Éditeur riche pour texte</li>
+                        <li>Affectation flexible des cibles (override possible)</li>
+                        <li>Prévisualisation par plateforme</li>
+                        <li>Planification temporelle</li>
+                    </ul>
+                </div>
+
+                <h3>Module 5 : Workflow d'Approbation</h3>
+                <div class="module-card">
+                    <ul class="features-list">
+                        <li>États : Draft → Review → Approved → Scheduled → Published</li>
+                        <li>Assignation de reviewers</li>
+                        <li>Système de commentaires</li>
+                        <li>Demandes de modifications</li>
+                        <li>Historique complet des changements</li>
+                        <li>Notifications à chaque étape</li>
+                    </ul>
+                </div>
+
+                <h3>Module 6 : Publication Engine (N8N)</h3>
+                <div class="module-card">
+                    <h4>Orchestration via N8N</h4>
+                    <ul class="features-list">
+                        <li>Déclenchement automatique depuis le CMS</li>
+                        <li>Génération de contenu (si nécessaire)</li>
+                        <li>Publication multi-plateforme parallèle</li>
+                        <li>Gestion des files d'attente</li>
+                        <li>Retry automatique en cas d'échec</li>
+                        <li>Logging détaillé de chaque étape</li>
+                    </ul>
+                </div>
+
+                <h3>Module 7 : Analytics & Reporting</h3>
+                <div class="module-card">
+                    <h4>Collecte de Métriques (N8N)</h4>
+                    <ul class="features-list">
+                        <li>Workflows planifiés pour chaque plateforme</li>
+                        <li>Normalisation des données</li>
+                        <li>Stockage dans PostgreSQL + Time Series DB</li>
+                    </ul>
+
+                    <h4>Dashboard Analytics</h4>
+                    <ul class="features-list">
+                        <li>Vue d'ensemble par campagne</li>
+                        <li>Métriques par objet et plateforme</li>
+                        <li>Graphiques interactifs (Chart.js)</li>
+                        <li>Comparaison de périodes</li>
+                        <li>Export CSV/Excel/PDF</li>
+                    </ul>
+
+                    <h4>Insights IA</h4>
+                    <ul class="features-list">
+                        <li>Détection d'anomalies</li>
+                        <li>Recommandations d'amélioration</li>
+                        <li>Prédiction de performance</li>
+                        <li>Analyse de sentiments</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="diagrammes">
+                <h2>Diagrammes d'Architecture</h2>
+
+                <h3>1. Architecture Système Complète</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        WEB[Web Browser]
+        MOBILE[Mobile App]
+    end
+
+    subgraph "CDN & Load Balancer"
+        CDN[CloudFlare CDN]
+        LB[Nginx Load Balancer]
+    end
+
+    subgraph "Symfony CMS"
+        API[API Platform]
+        AUTH[Auth Service]
+        CAMPAIGN[Campaign Manager]
+        MEDIA[Media Library]
+        WORKFLOW[Workflow Engine]
+    end
+
+    subgraph "N8N Automation"
+        N8N_CONTENT[Content Creation Workflows]
+        N8N_PUB[Publication Workflows]
+        N8N_ANALYTICS[Analytics Collection Workflows]
+    end
+
+    subgraph "Message Queue"
+        RABBIT[RabbitMQ]
+    end
+
+    subgraph "Data Layer"
+        PG[(PostgreSQL)]
+        REDIS[(Redis Cache)]
+        ES[(Elasticsearch)]
+        S3[(S3 Storage)]
+    end
+
+    subgraph "External Platforms"
+        YOUTUBE[YouTube]
+        INSTA[Instagram]
+        FACEBOOK[Facebook]
+        TIKTOK[TikTok]
+        WORDPRESS[WordPress]
+        TWITTER[Twitter/X]
+        LINKEDIN[LinkedIn]
+    end
+
+    WEB --> CDN
+    MOBILE --> CDN
+    CDN --> LB
+    LB --> API
+
+    API --> AUTH
+    API --> CAMPAIGN
+    API --> MEDIA
+    API --> WORKFLOW
+
+    CAMPAIGN --> RABBIT
+    MEDIA --> S3
+    MEDIA --> ES
+
+    RABBIT --> N8N_CONTENT
+    RABBIT --> N8N_PUB
+    RABBIT --> N8N_ANALYTICS
+
+    N8N_CONTENT --> S3
+    N8N_CONTENT --> RABBIT
+
+    N8N_PUB --> YOUTUBE
+    N8N_PUB --> INSTA
+    N8N_PUB --> FACEBOOK
+    N8N_PUB --> TIKTOK
+    N8N_PUB --> WORDPRESS
+    N8N_PUB --> TWITTER
+    N8N_PUB --> LINKEDIN
+
+    N8N_ANALYTICS --> YOUTUBE
+    N8N_ANALYTICS --> INSTA
+    N8N_ANALYTICS --> FACEBOOK
+    N8N_ANALYTICS --> RABBIT
+
+    RABBIT --> API
+    API --> PG
+    API --> REDIS
+
+    CDN --> S3
+                    </div>
+                </div>
+
+                <h3>2. Système d'Affectation Flexible</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Configuration par Agent"
+        AGENT[Agent/Admin]
+        AGENT --> SOCIAL_CONF[Configure Social Accounts]
+        AGENT --> SITE_CONF[Configure Websites]
+        AGENT --> AD_CONF[Configure Ad Accounts]
+    end
+
+    subgraph "Création de Campagne"
+        USER[User - Campaign Manager]
+        CAMPAIGN[Create Campaign]
+        USER --> CAMPAIGN
+    end
+
+    subgraph "Affectation Niveau Campagne"
+        CAMPAIGN_TARGETS[Campaign Target Assignment]
+        CAMPAIGN --> CAMPAIGN_TARGETS
+        CAMPAIGN_TARGETS --> FB_PAGE[Facebook Page A]
+        CAMPAIGN_TARGETS --> IG_ACCOUNT[Instagram @brand]
+        CAMPAIGN_TARGETS --> WP_SITE[WordPress Site]
+        CAMPAIGN_TARGETS --> YT_CHANNEL[YouTube Channel]
+    end
+
+    subgraph "Objets de la Campagne"
+        VIDEO1[Video: Product Demo]
+        POST1[Post: Launch Announcement]
+        ARTICLE1[Article: Tutorial]
+        IMAGE1[Image: Promo Banner]
+
+        CAMPAIGN --> VIDEO1
+        CAMPAIGN --> POST1
+        CAMPAIGN --> ARTICLE1
+        CAMPAIGN --> IMAGE1
+    end
+
+    subgraph "Affectation Niveau Objet - Override"
+        VIDEO1 -.Override.-> YT_ONLY[YouTube Only]
+        POST1 -.Override.-> FB_IG[Facebook + Instagram]
+        ARTICLE1 -.Inherit.-> WP_SITE
+        IMAGE1 -.Override.-> ALL_SOCIAL[All Social + Ads]
+    end
+
+    subgraph "Publication N8N"
+        VIDEO1 --> PUB_YT[N8N → YouTube]
+        POST1 --> PUB_FB[N8N → Facebook]
+        POST1 --> PUB_IG[N8N → Instagram]
+        ARTICLE1 --> PUB_WP[N8N → WordPress]
+        IMAGE1 --> PUB_ALL[N8N → Multiple]
+    end
+
+    style CAMPAIGN fill:#667eea,color:#fff
+    style VIDEO1 fill:#48bb78,color:#fff
+    style POST1 fill:#48bb78,color:#fff
+    style ARTICLE1 fill:#48bb78,color:#fff
+    style IMAGE1 fill:#48bb78,color:#fff
+    style PUB_YT fill:#764ba2,color:#fff
+    style PUB_FB fill:#764ba2,color:#fff
+    style PUB_IG fill:#764ba2,color:#fff
+    style PUB_WP fill:#764ba2,color:#fff
+    style PUB_ALL fill:#764ba2,color:#fff
+                    </div>
+                </div>
+
+                <h3>3. Système de Sourcing (Topics → Tags → Objects)</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Configuration Topics & Tags"
+        AGENT[Agent/Admin]
+
+        TOPIC1[Topic: Technology]
+        TOPIC2[Topic: Marketing]
+        TOPIC3[Topic: Lifestyle]
+
+        AGENT --> TOPIC1
+        AGENT --> TOPIC2
+        AGENT --> TOPIC3
+
+        TOPIC1 --> TAG1A[AI]
+        TOPIC1 --> TAG1B[Software]
+        TOPIC1 --> TAG1C[Innovation]
+
+        TOPIC2 --> TAG2A[SEO]
+        TOPIC2 --> TAG2B[Social Media]
+        TOPIC2 --> TAG2C[Content]
+
+        TOPIC3 --> TAG3A[Health]
+        TOPIC3 --> TAG3B[Travel]
+        TOPIC3 --> TAG3C[Food]
+    end
+
+    subgraph "Sourcing de Contenu"
+        MANUAL[Manual Sourcing]
+        AUTO[Automatic Sourcing]
+
+        USER[User] --> MANUAL
+        MANUAL --> UPLOAD_IMG[Upload Images]
+        MANUAL --> UPLOAD_VID[Upload Videos]
+        MANUAL --> UPLOAD_TXT[Upload Text]
+        MANUAL --> UPLOAD_AUD[Upload Audio]
+
+        N8N_SCHEDULER[N8N Scheduled Workflows] --> AUTO
+        AUTO --> API_UNSPLASH[Unsplash API]
+        AUTO --> API_PEXELS[Pexels API]
+        AUTO --> WEB_SCRAPER[Web Scraper]
+        AUTO --> RSS_FEED[RSS Feeds]
+    end
+
+    subgraph "IA Classification"
+        CLASSIFIER[AI Classifier - OpenAI/Claude]
+
+        UPLOAD_IMG --> CLASSIFIER
+        UPLOAD_VID --> CLASSIFIER
+        UPLOAD_TXT --> CLASSIFIER
+        UPLOAD_AUD --> CLASSIFIER
+        API_UNSPLASH --> CLASSIFIER
+        API_PEXELS --> CLASSIFIER
+        WEB_SCRAPER --> CLASSIFIER
+        RSS_FEED --> CLASSIFIER
+
+        CLASSIFIER --> AUTO_TAG[Auto-Tag Assignment]
+        AUTO_TAG --> TAG1A
+        AUTO_TAG --> TAG1B
+        AUTO_TAG --> TAG2B
+        AUTO_TAG --> TAG3A
+
+        AUTO_TAG --> MEDIA_LIB[(Media Library)]
+    end
+
+    subgraph "Utilisation en Campagne"
+        CAMPAIGN_MGR[Campaign Manager]
+
+        MEDIA_LIB --> SEARCH[Tag-Based Search]
+        TAG1A --> SEARCH
+        TAG2B --> SEARCH
+        TAG3A --> SEARCH
+
+        SEARCH --> CAMPAIGN_MGR
+
+        CAMPAIGN_MGR --> SELECT[Select Media]
+        SELECT --> CREATE_OBJ[Create Campaign Objects]
+    end
+
+    style AGENT fill:#667eea,color:#fff
+    style CLASSIFIER fill:#764ba2,color:#fff
+    style CAMPAIGN_MGR fill:#48bb78,color:#fff
+    style MEDIA_LIB fill:#f6ad55,color:#000
+                    </div>
+                </div>
+
+                <h3>4. Flux Complet de Publication via N8N</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant CMS as Symfony CMS
+    participant Queue as RabbitMQ
+    participant N8N
+    participant YouTube
+    participant Instagram
+    participant Facebook
+    participant WordPress
+
+    User->>CMS: Create Campaign + Objects
+    CMS->>CMS: Save to Database
+
+    User->>CMS: Approve & Schedule
+    CMS->>Queue: Dispatch Job
+    Queue->>N8N: Webhook Trigger
+
+    Note over N8N: Content Generation Workflow
+
+    par Video Generation
+        N8N->>N8N: Assemble Video Clips
+        N8N->>N8N: Add Subtitles
+        N8N->>N8N: Generate Thumbnail
+    end
+
+    par Image Processing
+        N8N->>N8N: Resize for Platforms
+        N8N->>N8N: Add Watermark
+        N8N->>N8N: Apply Filters
+    end
+
+    N8N->>Queue: Content Ready
+    Queue->>CMS: Update Status
+
+    User->>CMS: Start Publication
+    CMS->>Queue: Dispatch Publication
+    Queue->>N8N: Trigger Publication Workflow
+
+    par Multi-Platform Publish
+        N8N->>YouTube: Upload Video
+        YouTube-->>N8N: Video ID
+
+        N8N->>Instagram: Post Image
+        Instagram-->>N8N: Post ID
+
+        N8N->>Facebook: Publish Post
+        Facebook-->>N8N: Post ID
+
+        N8N->>WordPress: Create Article
+        WordPress-->>N8N: Article URL
+    end
+
+    N8N->>Queue: Publication Results
+    Queue->>CMS: Update Database
+    CMS-->>User: Notification
+
+    loop Hourly Analytics
+        N8N->>YouTube: Fetch Metrics
+        N8N->>Instagram: Fetch Metrics
+        N8N->>Facebook: Fetch Metrics
+        N8N->>Queue: Send Metrics
+        Queue->>CMS: Store Analytics
+    end
+                    </div>
+                </div>
+
+                <h3>5. Flux Complet - De la Création à l'Analytics</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+flowchart TB
+    START([User Starts])
+
+    subgraph "1. Sourcing"
+        A1[Agent Configure Topics & Tags]
+        A2{Sourcing Type?}
+        A3[Manual Upload]
+        A4[Auto Sourcing - N8N]
+        A5[AI Classification]
+        A6[Media Library]
+    end
+
+    subgraph "2. Campaign Creation"
+        B1[Create Campaign]
+        B2[Define Goals & Budget]
+        B3{Assign Targets?}
+        B4[Select Social/Web/Ad Accounts]
+        B5[Save Campaign Defaults]
+    end
+
+    subgraph "3. Object Creation"
+        C1[Create Objects]
+        C2{Object Type?}
+        C3[Video]
+        C4[Post]
+        C5[Article]
+        C6[Image]
+        C7[Advertisement]
+        C8{Override Targets?}
+        C9[Custom Targets]
+        C10[Inherit Defaults]
+    end
+
+    subgraph "4. Content Generation - N8N"
+        D1[Trigger N8N Workflow]
+        D2[Generate/Process Content]
+        D3{Quality Check?}
+        D4[Ready]
+        D5[Manual Review]
+    end
+
+    subgraph "5. Approval"
+        E1[Submit for Review]
+        E2{Approved?}
+        E3[Request Changes]
+        E4[Mark Approved]
+    end
+
+    subgraph "6. Publication - N8N"
+        F1[Schedule Publication]
+        F2{Timing?}
+        F3[Immediate]
+        F4[Scheduled]
+        F5[N8N Publication Workflow]
+        F6[Multi-Platform Publish]
+    end
+
+    subgraph "7. Post-Publication"
+        G1{Success?}
+        G2[Log Success]
+        G3[Retry]
+        G4[Notify User]
+    end
+
+    subgraph "8. Analytics - N8N"
+        H1[N8N Collect Metrics]
+        H2[Aggregate Data]
+        H3[Update Dashboard]
+        H4{Alerts?}
+        H5[Send Notifications]
+    end
+
+    START --> A1
+    A1 --> A2
+    A2 -->|Manual| A3
+    A2 -->|Auto| A4
+    A3 --> A5
+    A4 --> A5
+    A5 --> A6
+
+    A6 --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 -->|Yes| B4
+    B4 --> B5
+    B3 -->|No| C1
+    B5 --> C1
+
+    C1 --> C2
+    C2 --> C3 & C4 & C5 & C6 & C7
+    C3 --> C8
+    C4 --> C8
+    C5 --> C8
+    C6 --> C8
+    C7 --> C8
+
+    C8 -->|Yes| C9
+    C8 -->|No| C10
+    C9 --> D1
+    C10 --> D1
+
+    D1 --> D2
+    D2 --> D3
+    D3 -->|Pass| D4
+    D3 -->|Fail| D5
+    D4 --> E1
+    D5 --> E1
+
+    E1 --> E2
+    E2 -->|No| E3
+    E3 --> C1
+    E2 -->|Yes| E4
+
+    E4 --> F1
+    F1 --> F2
+    F2 -->|Now| F3
+    F2 -->|Later| F4
+    F3 --> F5
+    F4 --> F5
+    F5 --> F6
+
+    F6 --> G1
+    G1 -->|Yes| G2
+    G1 -->|No| G3
+    G2 --> G4
+    G3 --> G4
+
+    G4 --> H1
+    H1 --> H2
+    H2 --> H3
+    H3 --> H4
+    H4 -->|Yes| H5
+    H4 -->|No| END
+    H5 --> END([Completed])
+
+    style START fill:#667eea,color:#fff
+    style END fill:#48bb78,color:#fff
+    style D1 fill:#764ba2,color:#fff
+    style F5 fill:#764ba2,color:#fff
+    style H1 fill:#764ba2,color:#fff
+                    </div>
+                </div>
+
+                <h3>6. Diagramme Entité-Relation (ERD) Simplifié</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+erDiagram
+    User ||--o{ Campaign : creates
+    Agent ||--o{ SocialAccount : configures
+    Agent ||--o{ WebsiteConfig : configures
+    Agent ||--o{ AdAccount : configures
+    Agent ||--o{ Topic : creates
+
+    Topic ||--o{ Tag : contains
+
+    Campaign ||--o{ CampaignTarget : has
+    Campaign ||--o{ CampaignObject : contains
+
+    CampaignTarget }o--|| SocialAccount : targets
+    CampaignTarget }o--|| WebsiteConfig : targets
+    CampaignTarget }o--|| AdAccount : targets
+
+    CampaignObject }o--|| ObjectTarget : has_override
+
+    ObjectTarget }o--|| SocialAccount : targets
+    ObjectTarget }o--|| WebsiteConfig : targets
+
+    CampaignObject }o--o{ MediaAsset : uses
+
+    MediaAsset }o--o{ Tag : tagged_with
+    MediaAsset ||--|| MediaSource : sourced_from
+
+    CampaignObject ||--o{ Publication : generates
+    Publication ||--o{ AnalyticsMetric : tracks
+
+    User {
+        int id PK
+        string email
+        string role
+    }
+
+    Agent {
+        int id PK
+        int user_id FK
+        string permissions
+    }
+
+    Topic {
+        int id PK
+        string name
+        int agent_id FK
+    }
+
+    Tag {
+        int id PK
+        string name
+        int topic_id FK
+    }
+
+    Campaign {
+        int id PK
+        string name
+        int user_id FK
+        json goals
+        decimal budget
+    }
+
+    CampaignTarget {
+        int id PK
+        int campaign_id FK
+        string target_type
+        int target_id
+    }
+
+    CampaignObject {
+        int id PK
+        int campaign_id FK
+        string type
+        text content
+        string status
+    }
+
+    ObjectTarget {
+        int id PK
+        int object_id FK
+        string target_type
+        int target_id
+        boolean is_override
+    }
+
+    MediaAsset {
+        int id PK
+        string filename
+        string type
+        string cdn_url
+        int source_id FK
+    }
+
+    Publication {
+        int id PK
+        int object_id FK
+        string platform
+        string external_id
+        timestamp published_at
+    }
+
+    AnalyticsMetric {
+        int id PK
+        int publication_id FK
+        decimal impressions
+        decimal engagement
+        timestamp measured_at
+    }
+                    </div>
+                </div>
+            </section>
+
+            <section id="securite">
+                <h2>Sécurité & Conformité</h2>
+
+                <div class="module-card">
+                    <h4>Sécurité des Données</h4>
+                    <ul class="features-list">
+                        <li>Chiffrement des tokens OAuth2 au repos (AES-256)</li>
+                        <li>Stockage sécurisé via Symfony Secrets</li>
+                        <li>HTTPS obligatoire (TLS 1.3)</li>
+                        <li>Secrets rotation automatique (N8N + Symfony)</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>Authentification & Autorisation</h4>
+                    <ul class="features-list">
+                        <li>JWT pour API avec expiration courte (15 min)</li>
+                        <li>Refresh tokens sécurisés</li>
+                        <li>RBAC granulaire par module</li>
+                        <li>2FA obligatoire pour admins</li>
+                        <li>Rate limiting par IP et par user</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>Conformité RGPD</h4>
+                    <ul class="features-list">
+                        <li>Consentement explicite pour collecte de données</li>
+                        <li>Export de données utilisateur</li>
+                        <li>Droit à l'oubli (suppression complète)</li>
+                        <li>Logs d'audit conservés 1 an</li>
+                        <li>Chiffrement des données personnelles</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="implementation">
+                <h2>Plan d'Implémentation</h2>
+
+                <div class="phase-grid">
+                    <div class="phase-card">
+                        <h3>Phase 1: Fondations (MVP)</h3>
+                        <p><strong>Durée estimée : 2-3 mois</strong></p>
+                        <ul>
+                            <li>✓ Auth & RBAC</li>
+                            <li>✓ Configuration comptes par agent</li>
+                            <li>✓ Topics & Tags management</li>
+                            <li>✓ Upload manuel de médias</li>
+                            <li>✓ Création campagne basique</li>
+                            <li>✓ Affectation niveau campagne</li>
+                            <li>✓ CMS objets (post, image)</li>
+                            <li>✓ N8N : Publication Facebook uniquement</li>
+                            <li>✓ Analytics basiques (views, likes)</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 2: Multi-Platform</h3>
+                        <p><strong>Durée estimée : 2 mois</strong></p>
+                        <ul>
+                            <li>✓ Affectation niveau objet (override)</li>
+                            <li>✓ Support YouTube, Instagram, TikTok</li>
+                            <li>✓ WordPress integration</li>
+                            <li>✓ N8N : Image processing workflows</li>
+                            <li>✓ N8N : Video generation basique</li>
+                            <li>✓ Workflow approbation</li>
+                            <li>✓ Planification temporelle</li>
+                            <li>✓ Analytics multi-plateformes</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 3: IA & Automation</h3>
+                        <p><strong>Durée estimée : 2-3 mois</strong></p>
+                        <ul>
+                            <li>✓ Sourcing automatique (APIs)</li>
+                            <li>✓ Classification IA (OpenAI/Claude)</li>
+                            <li>✓ N8N : Text generation (GPT)</li>
+                            <li>✓ N8N : Video assembly avancé</li>
+                            <li>✓ Support Twitter/X, LinkedIn</li>
+                            <li>✓ Ad campaigns (Facebook Ads)</li>
+                            <li>✓ Analytics prédictifs</li>
+                            <li>✓ Recommandations IA</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 4: Enterprise</h3>
+                        <p><strong>Durée estimée : 2 mois</strong></p>
+                        <ul>
+                            <li>✓ Multi-workspace</li>
+                            <li>✓ Collaboration équipe avancée</li>
+                            <li>✓ White-label</li>
+                            <li>✓ API publique</li>
+                            <li>✓ Webhooks externes</li>
+                            <li>✓ Reporting avancé (PDF, Excel)</li>
+                            <li>✓ Intégration Zapier/Make</li>
+                            <li>✓ A/B Testing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Technologies & Outils par Phase</h3>
+                <div class="module-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Phase</th>
+                                <th>Backend</th>
+                                <th>N8N Workflows</th>
+                                <th>Intégrations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phase 1</strong></td>
+                                <td>Symfony 7, PostgreSQL, Redis</td>
+                                <td>Facebook Publish, Basic Analytics</td>
+                                <td>Facebook Graph API</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 2</strong></td>
+                                <td>+ Elasticsearch, RabbitMQ</td>
+                                <td>+ YouTube, Instagram, Image Processing</td>
+                                <td>+ YouTube API, Instagram API, WordPress REST API</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 3</strong></td>
+                                <td>+ S3/MinIO, Symfony Messenger</td>
+                                <td>+ Video Generation, AI Text, Classification</td>
+                                <td>+ OpenAI API, Unsplash, Pexels, TikTok API</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 4</strong></td>
+                                <td>+ API Platform, GraphQL</td>
+                                <td>+ Advanced Analytics, A/B Testing</td>
+                                <td>+ Twitter API, LinkedIn API, Google Ads, Zapier</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="infrastructure">
+                <h2>Infrastructure de Déploiement</h2>
+
+                <h3>Stack Production Recommandée</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Web Server</strong><br>
+                        Nginx 1.24+ (reverse proxy)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Application</strong><br>
+                        Symfony 7 + PHP-FPM 8.2
+                    </div>
+                    <div class="tech-item">
+                        <strong>Automation</strong><br>
+                        N8N (self-hosted Docker)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Database</strong><br>
+                        PostgreSQL 15+ (Master + Replica)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Cache</strong><br>
+                        Redis 7+ Cluster
+                    </div>
+                    <div class="tech-item">
+                        <strong>Queue</strong><br>
+                        RabbitMQ 3.12+ Cluster
+                    </div>
+                    <div class="tech-item">
+                        <strong>Search</strong><br>
+                        Elasticsearch 8+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Storage</strong><br>
+                        MinIO / AWS S3
+                    </div>
+                    <div class="tech-item">
+                        <strong>CDN</strong><br>
+                        CloudFlare
+                    </div>
+                    <div class="tech-item">
+                        <strong>Monitoring</strong><br>
+                        Prometheus + Grafana + Sentry
+                    </div>
+                    <div class="tech-item">
+                        <strong>CI/CD</strong><br>
+                        GitHub Actions / GitLab CI
+                    </div>
+                    <div class="tech-item">
+                        <strong>Containers</strong><br>
+                        Docker + Docker Compose
+                    </div>
+                </div>
+
+                <h3>Architecture Serveurs</h3>
+                <div class="module-card">
+                    <pre>
+┌─────────────────────────────────────────────┐
+│          CloudFlare CDN (Global)            │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│        Nginx Load Balancer (2x)             │
+└────┬─────────────────────┬──────────────────┘
+     │                     │
+┌────▼────────┐    ┌──────▼────────┐
+│ Symfony App │    │ Symfony App   │  (3+ instances)
+│   Server 1  │    │   Server 2    │
+└────┬────────┘    └──────┬────────┘
+     │                     │
+┌────▼─────────────────────▼────────┐
+│      RabbitMQ Cluster (3x)         │
+└────────────────┬───────────────────┘
+                 │
+┌────────────────▼───────────────────┐
+│      N8N Workers (3+)              │
+│   - Content Generation             │
+│   - Publication                    │
+│   - Analytics Collection           │
+└────────────────────────────────────┘
+
+Data Layer:
+├── PostgreSQL Master + 2 Replicas
+├── Redis Cluster (3 masters + 3 replicas)
+├── Elasticsearch Cluster (3 nodes)
+└── MinIO/S3 Object Storage
+                    </pre>
+                </div>
+
+                <h3>Sizing Recommandé (Production)</h3>
+                <div class="module-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>Storage</th>
+                                <th>Instances</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Symfony App</strong></td>
+                                <td>4 vCPU</td>
+                                <td>8 GB</td>
+                                <td>50 GB SSD</td>
+                                <td>3+</td>
+                            </tr>
+                            <tr>
+                                <td><strong>N8N Worker</strong></td>
+                                <td>4 vCPU</td>
+                                <td>8 GB</td>
+                                <td>100 GB SSD</td>
+                                <td>3+</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PostgreSQL</strong></td>
+                                <td>8 vCPU</td>
+                                <td>32 GB</td>
+                                <td>500 GB SSD</td>
+                                <td>1 master + 2 replicas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Redis</strong></td>
+                                <td>2 vCPU</td>
+                                <td>8 GB</td>
+                                <td>50 GB SSD</td>
+                                <td>6 (3 masters + 3 replicas)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RabbitMQ</strong></td>
+                                <td>2 vCPU</td>
+                                <td>4 GB</td>
+                                <td>100 GB SSD</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Elasticsearch</strong></td>
+                                <td>4 vCPU</td>
+                                <td>16 GB</td>
+                                <td>500 GB SSD</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MinIO/S3</strong></td>
+                                <td>2 vCPU</td>
+                                <td>4 GB</td>
+                                <td>5 TB+</td>
+                                <td>1 (ou S3 cloud)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="conclusion">
+                <h2>Prochaines Étapes</h2>
+
+                <div class="info-box">
+                    <h4>Actions Prioritaires</h4>
+                    <ol>
+                        <li><strong>Validation Architecturale</strong> - Revue avec stakeholders et équipe technique</li>
+                        <li><strong>Setup Environnement Dev</strong> - Docker Compose avec tous les services</li>
+                        <li><strong>POC N8N</strong> - Test workflows Facebook publication + analytics</li>
+                        <li><strong>Initialisation Symfony</strong> - Structure projet avec modules de base</li>
+                        <li><strong>Sprint 1 Planning</strong> - Découpage détaillé Phase 1 en sprints 2 semaines</li>
+                        <li><strong>Documentation API</strong> - Spécifications OpenAPI pour chaque module</li>
+                    </ol>
+                </div>
+
+                <div class="success-box">
+                    <h4>Livrables du Cahier des Charges</h4>
+                    <ul class="features-list">
+                        <li>✓ Architecture système complète</li>
+                        <li>✓ Spécifications fonctionnelles détaillées</li>
+                        <li>✓ 6 diagrammes d'architecture</li>
+                        <li>✓ Stack technologique validée</li>
+                        <li>✓ Plan d'implémentation en 4 phases</li>
+                        <li>✓ Specifications N8N workflows</li>
+                        <li>✓ Sizing infrastructure</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p><strong>Cahier des Charges Technique</strong></p>
+            <p>CMS de Gestion de Campagnes de Contenu Média Multi-Canal</p>
+            <p style="margin-top: 1rem;">Architecture Symfony 7 + N8N Automation</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">Version 2.0 - Document généré le 15 février 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#764ba2',
+                lineColor: '#667eea',
+                secondaryColor: '#764ba2',
+                tertiaryColor: '#f7fafc',
+                fontSize: '14px'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            }
+        });
+    </script>
+</body>
+</html>

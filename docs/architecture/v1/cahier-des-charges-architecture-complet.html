@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cahier des Charges Complet - CMS Campagnes Média</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .meta-info {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-item strong {
+            display: block;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .meta-item span {
+            font-size: 1.05rem;
+            font-weight: bold;
+        }
+
+        nav {
+            background: #2d3748;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 70px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h4 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 2rem;
+            border-left: 4px solid #667eea;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .intro h3 {
+            margin-top: 0;
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .vision-card {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .vision-card h4 {
+            color: #667eea;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tech-item {
+            background: #edf2f7;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .tech-item strong {
+            color: #764ba2;
+        }
+
+        .module-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .module-card h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .diagram-container {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .phase-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .phase-card h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .phase-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .phase-card li {
+            padding: 0.3rem 0;
+        }
+
+        .highlight-box {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #f6ad55;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .workflow-step {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .workflow-step h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .advantage-card {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border-left: 5px solid #28a745;
+        }
+
+        .advantage-card h4 {
+            color: #28a745;
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media print {
+            nav {
+                position: static;
+            }
+
+            .diagram-container {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .vision-grid,
+            .tech-stack,
+            .advantages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cahier des Charges Technique Complet</h1>
+            <p>CMS de Gestion de Campagnes de Contenu Média Multi-Canal</p>
+            <div class="meta-info">
+                <div class="meta-item">
+                    <strong>Version</strong>
+                    <span>3.0 Finale</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Date</strong>
+                    <span>Février 2026</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Backend</strong>
+                    <span>Symfony 7.x</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Content Generation</strong>
+                    <span>N8N</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Publication</strong>
+                    <span>Make.com</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Storage</strong>
+                    <span>SharePoint</span>
+                </div>
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#objectif">Objectif</a></li>
+                <li><a href="#fonctionnement">Fonctionnement</a></li>
+                <li><a href="#architecture-hybride">Architecture Hybride</a></li>
+                <li><a href="#flux-agent">Flux Agent</a></li>
+                <li><a href="#stack">Stack Technique</a></li>
+                <li><a href="#modules">Modules</a></li>
+                <li><a href="#securite">Sécurité</a></li>
+                <li><a href="#diagrammes">Diagrammes</a></li>
+                <li><a href="#infrastructure">Infrastructure</a></li>
+                <li><a href="#implementation">Implémentation</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- SECTION 1: OBJECTIF -->
+            <section id="objectif">
+                <h2>Objectif Principal du Projet</h2>
+
+                <div class="intro">
+                    <h3>Vision Globale</h3>
+                    <p>Développer un <strong>CMS complet de gestion de campagnes de contenu média</strong> permettant de créer, orchestrer et publier du contenu multi-format sur plusieurs canaux digitaux avec automatisation complète via N8N (génération) et Make.com (publication).</p>
+                </div>
+
+                <div class="success-box">
+                    <h4>Types d'Objets Gérés</h4>
+                    <ul class="features-list">
+                        <li><strong>Posts</strong> - Contenu social pour réseaux sociaux</li>
+                        <li><strong>Videos</strong> - Pour YouTube, TikTok, Instagram, Facebook</li>
+                        <li><strong>Articles</strong> - Pour blogs, WordPress, sites web</li>
+                        <li><strong>Images</strong> - Pour tous canaux digitaux</li>
+                        <li><strong>Advertisements</strong> - Publicités payantes (Facebook Ads, Google Ads, LinkedIn Ads)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION 2: FONCTIONNEMENT -->
+            <section id="fonctionnement">
+                <h2>Fonctionnement Détaillé du Système</h2>
+
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>1. Création de Campagnes</h4>
+                        <p><strong>Campagnes créées au niveau CMS</strong> par les utilisateurs. Chaque campagne regroupe plusieurs objets média et est basée sur le système <strong>Topics → Tags</strong> alimenté par le sourcing.</p>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>2. Système d'Affectation Flexible</h4>
+                        <p><strong>Double niveau d'affectation :</strong></p>
+                        <ul class="features-list">
+                            <li><strong>Niveau Campagne</strong> - Affectation globale héritée par tous les objets</li>
+                            <li><strong>Niveau Objet</strong> - Override individuel pour chaque objet</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>3. Sourcing Topics → Tags</h4>
+                        <p>L'agent préconfigure des <strong>Topics</strong> (thématiques) contenant des <strong>Tags</strong> (mots-clés). Le sourcing peut être <strong>manuel</strong> (upload) ou <strong>automatique</strong> (APIs, scraping).</p>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>4. Automatisation N8N + Make.com</h4>
+                        <p><strong>N8N</strong> pour génération de contenu (vidéos, images, texte). <strong>Make.com</strong> UNIQUEMENT pour publication multi-plateforme.</p>
+                    </div>
+                </div>
+
+                <h3>Flux d'Affectation Flexible</h3>
+
+                <div class="workflow-step">
+                    <h4>Affectation Niveau Campagne</h4>
+                    <p>Lors de la création d'une campagne, l'utilisateur peut :</p>
+                    <ul class="features-list">
+                        <li>Affecter la campagne complète à une liste de comptes sociaux préconfigurés</li>
+                        <li>Sélectionner des sites web (WordPress, custom)</li>
+                        <li>Choisir des ad accounts (Facebook Ads, Google Ads)</li>
+                        <li>Tous les objets de la campagne hériteront automatiquement de ces cibles</li>
+                    </ul>
+                    <p><strong>Exemple :</strong> Campagne "Lancement Produit X" → Facebook Page A, Instagram @brand, WordPress Site, YouTube Channel</p>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>Affectation Niveau Objet (Override)</h4>
+                    <p>Pour chaque objet individuel (video, post, article, image, ad), l'utilisateur peut :</p>
+                    <ul class="features-list">
+                        <li>Conserver les cibles héritées de la campagne</li>
+                        <li>Override avec des cibles spécifiques différentes</li>
+                        <li>Ajouter des cibles supplémentaires en plus des héritées</li>
+                        <li>Retirer certaines cibles de la liste héritée</li>
+                    </ul>
+                    <p><strong>Exemple :</strong></p>
+                    <ul>
+                        <li>Video A → YouTube uniquement (override)</li>
+                        <li>Post B → Facebook + Instagram (override)</li>
+                        <li>Article C → WordPress (hérité)</li>
+                        <li>Image D → Tous réseaux sociaux + Ads (override)</li>
+                    </ul>
+                </div>
+
+                <h3>Système de Sourcing (Topics → Tags)</h3>
+
+                <div class="workflow-step">
+                    <h4>Configuration par l'Agent</h4>
+                    <p>L'agent (admin) configure la structure hiérarchique :</p>
+                    <pre>
+Topic: Technology
+├── Tag: AI
+├── Tag: Software
+└── Tag: Innovation
+
+Topic: Marketing
+├── Tag: SEO
+├── Tag: Social Media
+└── Tag: Content Strategy
+
+Topic: Lifestyle
+├── Tag: Health
+├── Tag: Travel
+└── Tag: Food
+                    </pre>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>Sourcing de Contenu</h4>
+                    <p><strong>Sourcing Manuel :</strong></p>
+                    <ul class="features-list">
+                        <li>Upload direct par l'utilisateur (drag & drop)</li>
+                        <li>Types supportés : videos, images, text, audio</li>
+                        <li>Classification automatique via IA</li>
+                    </ul>
+
+                    <p><strong>Sourcing Automatique :</strong></p>
+                    <ul class="features-list">
+                        <li>Intégration APIs externes (Unsplash, Pexels, etc.)</li>
+                        <li>Web scraping configuré</li>
+                        <li>Flux RSS automatisés</li>
+                        <li>Import en masse planifié</li>
+                    </ul>
+                </div>
+
+                <h3>Comptes Préconfigurés par l'Agent</h3>
+
+                <div class="module-card">
+                    <h4>Types de Comptes Gérés</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Plateformes</th>
+                                <th>Authentification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Réseaux Sociaux</strong></td>
+                                <td>Facebook, Instagram, Twitter/X, LinkedIn, TikTok, YouTube</td>
+                                <td>OAuth2 via Make.com</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sites Web</strong></td>
+                                <td>WordPress, Sites Custom</td>
+                                <td>API Keys / Credentials via Make.com</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ad Accounts</strong></td>
+                                <td>Facebook Ads, Google Ads, LinkedIn Ads</td>
+                                <td>OAuth2 + Business Manager via Make.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 3: ARCHITECTURE HYBRIDE -->
+            <section id="architecture-hybride">
+                <h2>Architecture Hybride : N8N + Make.com</h2>
+
+                <div class="warning-box">
+                    <h3>Séparation des Responsabilités</h3>
+                    <p><strong>Important:</strong> Séparation claire entre génération de contenu (N8N) et publication (Make.com)</p>
+                </div>
+
+                <div class="advantages-grid">
+                    <div class="advantage-card">
+                        <h4>N8N - Content Generation & Analytics</h4>
+                        <ul class="features-list">
+                            <li>🎬 Génération de vidéos (assemblage, montage, sous-titres)</li>
+                            <li>🖼️ Traitement d'images (resize, watermark, optimisation)</li>
+                            <li>📝 Génération de texte (GPT/Claude)</li>
+                            <li>🎵 Traitement audio (transcription, TTS)</li>
+                            <li>🤖 Classification IA automatique</li>
+                            <li>📊 Collection d'analytics (horaire)</li>
+                            <li>📥 Sourcing automatique (APIs)</li>
+                        </ul>
+                    </div>
+
+                    <div class="advantage-card">
+                        <h4>Make.com - Publication UNIQUEMENT</h4>
+                        <ul class="features-list">
+                            <li>📤 Publication multi-plateforme</li>
+                            <li>🔗 Gestion OAuth des comptes sociaux</li>
+                            <li>⚡ Exécution instantanée via webhooks</li>
+                            <li>🔄 Retry automatique en cas d'échec</li>
+                            <li>✅ Pas de gestion de tokens dans le CMS</li>
+                            <li>🎯 Scénarios basiques (3 modules)</li>
+                        </ul>
+                    </div>
+
+                    <div class="advantage-card">
+                        <h4>SharePoint - Storage</h4>
+                        <ul class="features-list">
+                            <li>✅ Intégration M365 native</li>
+                            <li>✅ Permissions granulaires (ACL)</li>
+                            <li>✅ Versioning automatique</li>
+                            <li>✅ Prévisualisation native</li>
+                            <li>✅ Pas de coûts S3</li>
+                            <li>✅ Microsoft Graph API</li>
+                        </ul>
+                    </div>
+
+                    <div class="advantage-card">
+                        <h4>Meilisearch - Search</h4>
+                        <ul class="features-list">
+                            <li>✅ Ultra rapide (&lt; 50ms)</li>
+                            <li>✅ Facile à déployer (Docker)</li>
+                            <li>✅ Typo-tolerant</li>
+                            <li>✅ Faceted search</li>
+                            <li>✅ Léger vs Elasticsearch</li>
+                            <li>✅ + PostgreSQL Full-Text Search</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Workflows N8N - Génération de Contenu</h3>
+
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>Génération de Vidéos</h4>
+                        <ul class="features-list">
+                            <li>Assemblage automatique de clips</li>
+                            <li>Montage vidéo (transitions, effets)</li>
+                            <li>Ajout de sous-titres automatiques (Whisper AI)</li>
+                            <li>Compression et formatage multi-plateforme</li>
+                            <li>Génération de thumbnails</li>
+                            <li>Upload vers SharePoint</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Traitement d'Images</h4>
+                        <ul class="features-list">
+                            <li>Redimensionnement automatique par plateforme</li>
+                            <li>Application de filtres et branding</li>
+                            <li>Ajout de watermark</li>
+                            <li>Optimisation pour le web</li>
+                            <li>Génération de variantes (carrée, paysage, portrait)</li>
+                            <li>Upload vers SharePoint</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Génération de Texte</h4>
+                        <ul class="features-list">
+                            <li>IA pour génération de posts (GPT, Claude)</li>
+                            <li>Adaptation du ton par plateforme</li>
+                            <li>Génération de hashtags pertinents</li>
+                            <li>Optimisation SEO pour articles</li>
+                            <li>Traduction multilingue</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Traitement Audio</h4>
+                        <ul class="features-list">
+                            <li>Transcription audio → texte (Whisper)</li>
+                            <li>Text-to-speech pour vidéos</li>
+                            <li>Nettoyage audio</li>
+                            <li>Ajout de musique de fond</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Workflows Analytics N8N</h3>
+
+                <div class="workflow-step">
+                    <h4>Collecte Automatique de Métriques</h4>
+                    <p>N8N exécute des workflows planifiés pour récupérer les métriques :</p>
+                    <ul class="features-list">
+                        <li><strong>Toutes les heures</strong> : Metrics YouTube, Facebook, Instagram, TikTok</li>
+                        <li><strong>Quotidien</strong> : WordPress stats</li>
+                        <li><strong>Hebdomadaire</strong> : Backlinks analysis, SEO metrics</li>
+                        <li>Normalisation et agrégation des données</li>
+                        <li>Envoi vers CMS pour stockage et affichage</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION 4: FLUX AGENT -->
+            <section id="flux-agent">
+                <h2>Configuration Initiale par l'Agent (Make.com)</h2>
+
+                <div class="success-box">
+                    <h3>Principe Clé</h3>
+                    <p><strong>L'agent configure une fois via Make.com, tous les utilisateurs utilisent.</strong></p>
+                    <p>Les comptes sociaux sont préconfigurés par l'agent avec OAuth via Make.com, puis réutilisés dans toutes les campagnes.</p>
+                </div>
+
+                <h3>Flux de Création de Compte Social</h3>
+
+                <div class="workflow-step">
+                    <h4>Étapes Détaillées</h4>
+                    <pre>
+1. Agent → CMS : "Add Social Account" (Facebook Page)
+   - Platform: Facebook
+   - Account Name: "Page Entreprise"
+   - Account Type: page
+
+2. CMS → Make API : Create OAuth URL
+   POST https://eu1.make.com/api/v2/connections
+   {
+     "accountName": "Page Facebook Entreprise",
+     "accountType": "facebook-pages",
+     "scopes": ["pages_manage_posts", "pages_read_engagement"]
+   }
+
+3. Make API → CMS : Return OAuth URL
+   {
+     "authUrl": "https://www.facebook.com/v18.0/dialog/oauth?..."
+   }
+
+4. CMS → Agent : Display "Cliquez pour authentifier"
+   Agent → Click → Browser → Facebook OAuth
+
+5. Facebook → User (Owner) : "Authorize App?"
+   User → YES (Authorize)
+   Facebook → Make : authorization_code
+
+6. Make → Create Connection (conn_fb_001)
+   Make → Auto-Create Basic Scenario :
+     Module 1: Webhook Trigger
+     Module 2: Get Media from Payload
+     Module 3: Facebook Create Post (use connection)
+     Module 4: HTTP Callback CMS
+
+7. Make → CMS Webhook :
+   {
+     "connection_id": "conn_fb_001",
+     "scenario_id": "scen_123",
+     "webhook_url": "https://hook.make.com/xyz"
+   }
+
+8. CMS → Store in social_accounts table :
+   - platform: facebook
+   - account_name: "Page Entreprise"
+   - make_connection_id: conn_fb_001
+   - make_scenario_id: scen_123
+   - webhook_url: https://hook.make.com/xyz
+   - status: active
+
+✅ Compte configuré et prêt à être utilisé dans les campagnes
+                    </pre>
+                </div>
+
+                <h3>Scénario Make Basique (Auto-créé)</h3>
+
+                <div class="module-card">
+                    <h4>Structure Minimale (3 modules)</h4>
+                    <pre><code>{
+  "modules": [
+    {
+      "1": "Webhook Trigger",
+      "input": {
+        "object_id": 789,
+        "campaign_id": 123,
+        "content": {
+          "message": "Texte du post",
+          "media_url": "https://sharepoint.com/.../image.jpg",
+          "hashtags": ["tech", "innovation"]
+        },
+        "platform_config": {
+          "page_id": "123456789"
+        }
+      }
+    },
+    {
+      "2": "Facebook Create Post",
+      "connection": "{{MAKE_CONNECTION_ID}}",
+      "page_id": "{{1.platform_config.page_id}}",
+      "message": "{{1.content.message}}",
+      "picture": "{{1.content.media_url}}"
+    },
+    {
+      "3": "HTTP Callback",
+      "url": "https://cms.example.com/api/webhooks/status",
+      "body": {
+        "object_id": "{{1.object_id}}",
+        "status": "success",
+        "external_id": "{{2.id}}",
+        "platform": "facebook"
+      }
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <h3>Templates de Scénarios par Plateforme</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Plateforme</th>
+                            <th>Module Make</th>
+                            <th>Champs Requis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Facebook</strong></td>
+                            <td>facebook:CreatePost</td>
+                            <td>page_id, message, picture/link</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Instagram</strong></td>
+                            <td>instagram:CreateMedia</td>
+                            <td>image_url, caption</td>
+                        </tr>
+                        <tr>
+                            <td><strong>YouTube</strong></td>
+                            <td>youtube:UploadVideo</td>
+                            <td>video_url, title, description</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WordPress</strong></td>
+                            <td>wordpress:CreatePost</td>
+                            <td>title, content, featured_media</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Twitter/X</strong></td>
+                            <td>twitter:CreateTweet</td>
+                            <td>text, media_ids</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LinkedIn</strong></td>
+                            <td>linkedin:ShareUpdate</td>
+                            <td>text, content_url</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- SECTION 5: STACK TECHNIQUE -->
+            <section id="stack">
+                <h2>Stack Technologique Final</h2>
+
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Backend Framework</strong><br>
+                        Symfony 7.x (PHP 8.2+)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Content Generation</strong><br>
+                        N8N (Self-hosted)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Publication Gateway</strong><br>
+                        Make.com (API)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Base de Données</strong><br>
+                        PostgreSQL 15+ (+ Full-Text Search)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Cache & Sessions</strong><br>
+                        Redis 7+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Message Queue</strong><br>
+                        RabbitMQ
+                    </div>
+                    <div class="tech-item">
+                        <strong>Search Engine</strong><br>
+                        Meilisearch
+                    </div>
+                    <div class="tech-item">
+                        <strong>Storage</strong><br>
+                        SharePoint (Microsoft Graph API)
+                    </div>
+                    <div class="tech-item">
+                        <strong>API</strong><br>
+                        API Platform
+                    </div>
+                    <div class="tech-item">
+                        <strong>Web Server</strong><br>
+                        Nginx + PHP-FPM
+                    </div>
+                </div>
+
+                <h3>Composants Symfony Clés</h3>
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>Core Components</h4>
+                        <ul class="features-list">
+                            <li>Symfony Messenger - Async messaging</li>
+                            <li>API Platform - RESTful API</li>
+                            <li>Doctrine ORM - Database abstraction</li>
+                            <li>Symfony Security - Auth & RBAC</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Additional Bundles</h4>
+                        <ul class="features-list">
+                            <li>Symfony Workflow - Content approval</li>
+                            <li>LexikJWTAuthenticationBundle - JWT</li>
+                            <li>VichUploaderBundle - File uploads</li>
+                            <li>EasyAdmin - Admin dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 6: MODULES -->
+            <section id="modules">
+                <h2>Modules Détaillés</h2>
+
+                <h3>Module 1 : Gestion Utilisateur & Sécurité</h3>
+                <div class="module-card">
+                    <ul class="features-list">
+                        <li>Authentification multi-facteurs (2FA)</li>
+                        <li>Rôles : Admin, Agent, Campaign Manager, Editor, Publisher, Viewer</li>
+                        <li>Gestion d'équipes et workspaces</li>
+                        <li>Logs d'audit complets</li>
+                        <li>API keys management</li>
+                        <li>Session management via Redis</li>
+                        <li>Rate limiting par IP et par user</li>
+                    </ul>
+                </div>
+
+                <h3>Module 2 : Configuration des Comptes (Agent)</h3>
+                <div class="module-card">
+                    <h4>Préconfiguration via Make.com</h4>
+                    <ul class="features-list">
+                        <li>Connexion OAuth2 aux réseaux sociaux via Make API</li>
+                        <li>Configuration WordPress API</li>
+                        <li>Setup Ad Accounts (Facebook Business Manager, Google Ads)</li>
+                        <li>Auto-création de scénarios Make basiques</li>
+                        <li>Stockage des connection_ids et webhook_urls</li>
+                        <li>Test de connexion et validation</li>
+                        <li>Révocation et renouvellement de tokens</li>
+                    </ul>
+                </div>
+
+                <h3>Module 3 : Sourcing & Classification</h3>
+                <div class="module-card">
+                    <h4>Topics & Tags Management</h4>
+                    <ul class="features-list">
+                        <li>Création hiérarchique Topics → Tags</li>
+                        <li>Interface drag & drop pour organisation</li>
+                        <li>Import/export de taxonomie</li>
+                    </ul>
+
+                    <h4>Sourcing de Contenu</h4>
+                    <ul class="features-list">
+                        <li>Upload manuel avec drag & drop</li>
+                        <li>Connecteurs APIs (Unsplash, Pexels, Pixabay)</li>
+                        <li>Web scraping configuré (N8N workflows)</li>
+                        <li>Import RSS feeds</li>
+                        <li>Classification IA automatique (OpenAI/Claude via N8N)</li>
+                    </ul>
+
+                    <h4>Bibliothèque Média</h4>
+                    <ul class="features-list">
+                        <li>Organisation par folders et tags</li>
+                        <li>Recherche avancée (Meilisearch + PostgreSQL FTS)</li>
+                        <li>Prévisualisation inline (SharePoint)</li>
+                        <li>Métadonnées complètes (EXIF, dimensions, durée)</li>
+                        <li>Versioning des médias (SharePoint natif)</li>
+                        <li>Permissions granulaires (SharePoint ACL)</li>
+                    </ul>
+                </div>
+
+                <h3>Module 4 : Gestionnaire de Campagnes</h3>
+                <div class="module-card">
+                    <h4>Création de Campagne</h4>
+                    <ul class="features-list">
+                        <li>Wizard de création étape par étape</li>
+                        <li>Définition d'objectifs et KPIs</li>
+                        <li>Sélection de topics & tags</li>
+                        <li>Budget et timeline</li>
+                        <li>Affectation des cibles (niveau campagne)</li>
+                        <li>Sélection depuis comptes préconfigurés</li>
+                    </ul>
+
+                    <h4>Création d'Objets</h4>
+                    <ul class="features-list">
+                        <li>Créer Video, Post, Article, Image, Advertisement</li>
+                        <li>Sélection de médias depuis la bibliothèque</li>
+                        <li>Éditeur riche pour texte (TinyMCE/CKEditor)</li>
+                        <li>Affectation flexible des cibles (override possible)</li>
+                        <li>Prévisualisation par plateforme</li>
+                        <li>Planification temporelle</li>
+                        <li>Déclenchement workflows N8N pour génération</li>
+                    </ul>
+                </div>
+
+                <h3>Module 5 : Workflow d'Approbation</h3>
+                <div class="module-card">
+                    <ul class="features-list">
+                        <li>États : Draft → Review → Approved → Scheduled → Published</li>
+                        <li>Assignation de reviewers par rôle</li>
+                        <li>Système de commentaires en temps réel</li>
+                        <li>Demandes de modifications avec tracking</li>
+                        <li>Historique complet des changements</li>
+                        <li>Notifications à chaque étape (email + in-app)</li>
+                        <li>Approbation multi-niveaux configurable</li>
+                    </ul>
+                </div>
+
+                <h3>Module 6 : Publication Engine (Make.com)</h3>
+                <div class="module-card">
+                    <h4>Orchestration via Make.com</h4>
+                    <ul class="features-list">
+                        <li>Déclenchement automatique depuis le CMS</li>
+                        <li>Payload JSON préparé par le CMS</li>
+                        <li>POST vers webhook Make pour chaque cible</li>
+                        <li>Scénarios Make exécutent publication</li>
+                        <li>Retry automatique en cas d'échec (Make natif)</li>
+                        <li>Callback CMS avec résultats (success/failure)</li>
+                        <li>Logging détaillé de chaque étape</li>
+                        <li>Tracking des external_ids par plateforme</li>
+                    </ul>
+                </div>
+
+                <h3>Module 7 : Analytics & Reporting</h3>
+                <div class="module-card">
+                    <h4>Collecte de Métriques (N8N)</h4>
+                    <ul class="features-list">
+                        <li>Workflows planifiés pour chaque plateforme</li>
+                        <li>Normalisation des données</li>
+                        <li>Stockage dans PostgreSQL + Time Series</li>
+                        <li>Agrégation horaire/quotidienne/hebdomadaire</li>
+                    </ul>
+
+                    <h4>Dashboard Analytics</h4>
+                    <ul class="features-list">
+                        <li>Vue d'ensemble par campagne</li>
+                        <li>Métriques par objet et plateforme</li>
+                        <li>Graphiques interactifs (Chart.js)</li>
+                        <li>Comparaison de périodes</li>
+                        <li>Export CSV/Excel/PDF</li>
+                        <li>Rapports planifiés (email automatique)</li>
+                    </ul>
+
+                    <h4>Insights IA</h4>
+                    <ul class="features-list">
+                        <li>Détection d'anomalies</li>
+                        <li>Recommandations d'amélioration</li>
+                        <li>Prédiction de performance</li>
+                        <li>Analyse de sentiments</li>
+                        <li>Meilleurs horaires de publication</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION 7: SÉCURITÉ -->
+            <section id="securite">
+                <h2>Sécurité & Conformité</h2>
+
+                <div class="module-card">
+                    <h4>Sécurité des Données</h4>
+                    <ul class="features-list">
+                        <li>Pas de stockage de tokens OAuth (gérés par Make.com)</li>
+                        <li>Stockage des connection_ids seulement</li>
+                        <li>HTTPS obligatoire (TLS 1.3)</li>
+                        <li>Chiffrement des credentials API (Symfony Secrets)</li>
+                        <li>SharePoint permissions granulaires par fichier</li>
+                        <li>Logs d'audit complets (qui a fait quoi, quand)</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>Authentification & Autorisation</h4>
+                    <ul class="features-list">
+                        <li>JWT pour API avec expiration courte (15 min)</li>
+                        <li>Refresh tokens sécurisés (stockés dans Redis)</li>
+                        <li>RBAC granulaire par module</li>
+                        <li>2FA obligatoire pour admins et agents</li>
+                        <li>Rate limiting par IP et par user (Redis)</li>
+                        <li>Détection de comportements anormaux</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>Conformité RGPD</h4>
+                    <ul class="features-list">
+                        <li>Consentement explicite pour collecte de données</li>
+                        <li>Export de données utilisateur (API + UI)</li>
+                        <li>Droit à l'oubli (suppression complète cascade)</li>
+                        <li>Logs d'audit conservés 1 an minimum</li>
+                        <li>Chiffrement des données personnelles</li>
+                        <li>Privacy policy intégrée</li>
+                        <li>Cookie consent management</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>Sécurité API</h4>
+                    <ul class="features-list">
+                        <li>API keys avec scope limité</li>
+                        <li>CORS configuration stricte</li>
+                        <li>Rate limiting agressif sur endpoints sensibles</li>
+                        <li>Validation et sanitization de tous les inputs</li>
+                        <li>Protection CSRF pour formulaires</li>
+                        <li>Content Security Policy (CSP)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION 8: DIAGRAMMES -->
+            <section id="diagrammes">
+                <h2>Diagrammes d'Architecture</h2>
+
+                <h3>1. Architecture Système Complète</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        WEB[Web Browser]
+        MOBILE[Mobile App]
+    end
+
+    subgraph "Load Balancer"
+        LB[Nginx Load Balancer]
+        CDN[CloudFlare CDN]
+    end
+
+    subgraph "Symfony CMS"
+        API[API Platform]
+        AUTH[Auth Service]
+        CAMPAIGN[Campaign Manager]
+        MEDIA[Media Service]
+        MAKE_SVC[Make API Service]
+        ANALYTICS[Analytics Service]
+    end
+
+    subgraph "N8N - Content Generation"
+        N8N_VIDEO[Video Generation]
+        N8N_IMAGE[Image Processing]
+        N8N_TEXT[Text Generation]
+        N8N_ANALYTICS[Analytics Collection]
+    end
+
+    subgraph "Make.com - Publication"
+        MAKE_API[Make REST API]
+        MAKE_SCENARIOS[Scenarios Auto-created]
+        MAKE_CONN[Social Connections OAuth]
+    end
+
+    subgraph "Message Queue"
+        RABBIT[RabbitMQ]
+    end
+
+    subgraph "Data Layer"
+        PG[(PostgreSQL<br/>+ Full-Text Search)]
+        REDIS[(Redis Cache)]
+        MEILISEARCH[(Meilisearch)]
+    end
+
+    subgraph "Storage"
+        SHAREPOINT[SharePoint<br/>Microsoft Graph API]
+    end
+
+    subgraph "External Platforms"
+        FB[Facebook]
+        IG[Instagram]
+        YT[YouTube]
+        TW[Twitter/X]
+        LI[LinkedIn]
+        WP[WordPress]
+    end
+
+    WEB --> CDN
+    MOBILE --> CDN
+    CDN --> LB
+    LB --> API
+
+    API --> AUTH
+    API --> CAMPAIGN
+    API --> MEDIA
+    API --> MAKE_SVC
+    API --> ANALYTICS
+
+    CAMPAIGN --> RABBIT
+    MEDIA --> SHAREPOINT
+    MEDIA --> MEILISEARCH
+
+    RABBIT --> N8N_VIDEO
+    RABBIT --> N8N_IMAGE
+    RABBIT --> N8N_TEXT
+
+    N8N_VIDEO --> SHAREPOINT
+    N8N_IMAGE --> SHAREPOINT
+    N8N_VIDEO --> RABBIT
+    N8N_IMAGE --> RABBIT
+
+    MAKE_SVC --> MAKE_API
+    MAKE_API --> MAKE_CONN
+    MAKE_CONN --> MAKE_SCENARIOS
+
+    CAMPAIGN --> MAKE_SCENARIOS
+
+    MAKE_SCENARIOS --> FB
+    MAKE_SCENARIOS --> IG
+    MAKE_SCENARIOS --> YT
+    MAKE_SCENARIOS --> TW
+    MAKE_SCENARIOS --> LI
+    MAKE_SCENARIOS --> WP
+
+    FB -.Callback.-> API
+    IG -.Callback.-> API
+
+    RABBIT --> N8N_ANALYTICS
+    N8N_ANALYTICS --> FB
+    N8N_ANALYTICS --> IG
+    N8N_ANALYTICS --> YT
+    N8N_ANALYTICS --> RABBIT
+
+    RABBIT --> API
+    API --> PG
+    API --> REDIS
+
+    CDN --> SHAREPOINT
+
+    style N8N_VIDEO fill:#f6ad55,color:#000
+    style N8N_IMAGE fill:#f6ad55,color:#000
+    style N8N_TEXT fill:#f6ad55,color:#000
+    style N8N_ANALYTICS fill:#f6ad55,color:#000
+    style MAKE_API fill:#764ba2,color:#fff
+    style MAKE_SCENARIOS fill:#764ba2,color:#fff
+    style SHAREPOINT fill:#48bb78,color:#fff
+                    </div>
+                </div>
+
+                <h3>2. Flux Configuration Agent (Make.com)</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+sequenceDiagram
+    participant Agent
+    participant CMS
+    participant MakeAPI as Make API
+    participant Facebook
+
+    Agent->>CMS: Add Social Account (Facebook Page)
+    CMS->>MakeAPI: POST /connections (Create OAuth URL)
+    MakeAPI-->>CMS: Return OAuth URL
+
+    CMS->>Agent: Display "Cliquez pour authentifier"
+    Agent->>Facebook: Click → OAuth Authorization
+    Facebook->>Agent: "Authorize App?"
+    Agent->>Facebook: YES (Authorize)
+
+    Facebook->>MakeAPI: Authorization Code
+    MakeAPI->>MakeAPI: Create Connection (conn_fb_001)
+
+    MakeAPI->>MakeAPI: Auto-Create Basic Scenario:<br/>1. Webhook Trigger<br/>2. Get Media<br/>3. Facebook Post<br/>4. HTTP Callback
+
+    MakeAPI->>CMS: Webhook Callback
+    Note over MakeAPI,CMS: {<br/>  connection_id: conn_fb_001,<br/>  scenario_id: scen_123,<br/>  webhook_url: "https://hook.make.com/xyz"<br/>}
+
+    CMS->>CMS: Store in social_accounts table
+    CMS->>Agent: Notification "Compte configuré ✓"
+                    </div>
+                </div>
+
+                <h3>3. Système d'Affectation Flexible</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Configuration par Agent"
+        AGENT[Agent/Admin]
+        AGENT --> SOCIAL_CONF[Configure Social Accounts via Make]
+        AGENT --> SITE_CONF[Configure Websites]
+    end
+
+    subgraph "Création de Campagne"
+        USER[User - Campaign Manager]
+        CAMPAIGN[Create Campaign]
+        USER --> CAMPAIGN
+    end
+
+    subgraph "Affectation Niveau Campagne"
+        CAMPAIGN_TARGETS[Campaign Target Assignment]
+        CAMPAIGN --> CAMPAIGN_TARGETS
+        CAMPAIGN_TARGETS --> FB_PAGE[Facebook Page A]
+        CAMPAIGN_TARGETS --> IG_ACCOUNT[Instagram @brand]
+        CAMPAIGN_TARGETS --> WP_SITE[WordPress Site]
+        CAMPAIGN_TARGETS --> YT_CHANNEL[YouTube Channel]
+    end
+
+    subgraph "Objets de la Campagne"
+        VIDEO1[Video: Product Demo]
+        POST1[Post: Launch Announcement]
+        ARTICLE1[Article: Tutorial]
+        IMAGE1[Image: Promo Banner]
+
+        CAMPAIGN --> VIDEO1
+        CAMPAIGN --> POST1
+        CAMPAIGN --> ARTICLE1
+        CAMPAIGN --> IMAGE1
+    end
+
+    subgraph "Affectation Niveau Objet - Override"
+        VIDEO1 -.Override.-> YT_ONLY[YouTube Only]
+        POST1 -.Override.-> FB_IG[Facebook + Instagram]
+        ARTICLE1 -.Inherit.-> WP_SITE
+        IMAGE1 -.Override.-> ALL_SOCIAL[All Social]
+    end
+
+    subgraph "Publication Make.com"
+        VIDEO1 --> PUB_YT[Make → YouTube]
+        POST1 --> PUB_FB[Make → Facebook]
+        POST1 --> PUB_IG[Make → Instagram]
+        ARTICLE1 --> PUB_WP[Make → WordPress]
+        IMAGE1 --> PUB_ALL[Make → Multiple]
+    end
+
+    style CAMPAIGN fill:#667eea,color:#fff
+    style VIDEO1 fill:#48bb78,color:#fff
+    style POST1 fill:#48bb78,color:#fff
+    style ARTICLE1 fill:#48bb78,color:#fff
+    style IMAGE1 fill:#48bb78,color:#fff
+    style PUB_YT fill:#764ba2,color:#fff
+    style PUB_FB fill:#764ba2,color:#fff
+    style PUB_IG fill:#764ba2,color:#fff
+    style PUB_WP fill:#764ba2,color:#fff
+    style PUB_ALL fill:#764ba2,color:#fff
+                    </div>
+                </div>
+
+                <h3>4. Système de Sourcing (Topics → Tags → Objects)</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Configuration Topics & Tags"
+        AGENT[Agent/Admin]
+
+        TOPIC1[Topic: Technology]
+        TOPIC2[Topic: Marketing]
+        TOPIC3[Topic: Lifestyle]
+
+        AGENT --> TOPIC1
+        AGENT --> TOPIC2
+        AGENT --> TOPIC3
+
+        TOPIC1 --> TAG1A[AI]
+        TOPIC1 --> TAG1B[Software]
+        TOPIC1 --> TAG1C[Innovation]
+
+        TOPIC2 --> TAG2A[SEO]
+        TOPIC2 --> TAG2B[Social Media]
+        TOPIC2 --> TAG2C[Content]
+
+        TOPIC3 --> TAG3A[Health]
+        TOPIC3 --> TAG3B[Travel]
+        TOPIC3 --> TAG3C[Food]
+    end
+
+    subgraph "Sourcing de Contenu"
+        MANUAL[Manual Sourcing]
+        AUTO[Automatic Sourcing]
+
+        USER[User] --> MANUAL
+        MANUAL --> UPLOAD_IMG[Upload Images]
+        MANUAL --> UPLOAD_VID[Upload Videos]
+        MANUAL --> UPLOAD_TXT[Upload Text]
+
+        N8N_SCHEDULER[N8N Scheduled Workflows] --> AUTO
+        AUTO --> API_UNSPLASH[Unsplash API]
+        AUTO --> API_PEXELS[Pexels API]
+        AUTO --> WEB_SCRAPER[Web Scraper]
+    end
+
+    subgraph "IA Classification - N8N"
+        CLASSIFIER[AI Classifier - OpenAI/Claude]
+
+        UPLOAD_IMG --> CLASSIFIER
+        UPLOAD_VID --> CLASSIFIER
+        UPLOAD_TXT --> CLASSIFIER
+        API_UNSPLASH --> CLASSIFIER
+        API_PEXELS --> CLASSIFIER
+        WEB_SCRAPER --> CLASSIFIER
+
+        CLASSIFIER --> AUTO_TAG[Auto-Tag Assignment]
+        AUTO_TAG --> TAG1A
+        AUTO_TAG --> TAG1B
+        AUTO_TAG --> TAG2B
+
+        AUTO_TAG --> SHAREPOINT_LIB[SharePoint Media Library]
+    end
+
+    subgraph "Utilisation en Campagne"
+        CAMPAIGN_MGR[Campaign Manager]
+
+        SHAREPOINT_LIB --> SEARCH[Tag-Based Search - Meilisearch]
+        TAG1A --> SEARCH
+        TAG2B --> SEARCH
+
+        SEARCH --> CAMPAIGN_MGR
+        CAMPAIGN_MGR --> SELECT[Select Media]
+        SELECT --> CREATE_OBJ[Create Campaign Objects]
+    end
+
+    style AGENT fill:#667eea,color:#fff
+    style CLASSIFIER fill:#f6ad55,color:#000
+    style CAMPAIGN_MGR fill:#48bb78,color:#fff
+    style SHAREPOINT_LIB fill:#48bb78,color:#fff
+                    </div>
+                </div>
+
+                <h3>5. Flux Complet de Publication</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant CMS
+    participant N8N
+    participant SharePoint
+    participant Make as Make Scenario
+    participant Facebook
+    participant Instagram
+
+    User->>CMS: Create Campaign + Video Object
+    CMS->>CMS: Save to Database
+
+    Note over User,CMS: Content Generation Phase (N8N)
+
+    CMS->>N8N: Webhook: Generate Video
+    N8N->>N8N: Download source clips
+    N8N->>N8N: Assemble video (ffmpeg)
+    N8N->>N8N: Add subtitles (Whisper AI)
+    N8N->>N8N: Generate thumbnail
+
+    N8N->>SharePoint: Upload video.mp4
+    SharePoint-->>N8N: File ID & URL
+    N8N->>SharePoint: Create sharing link
+    SharePoint-->>N8N: Public URL
+
+    N8N->>CMS: Webhook: Content Ready
+    CMS->>CMS: Update object: media_url
+    CMS-->>User: Notification "Vidéo prête ✓"
+
+    Note over User,CMS: Approval Workflow
+
+    User->>CMS: Approve & Schedule Publication
+    CMS->>CMS: Prepare payload
+
+    Note over User,CMS: Publication Phase (Make.com)
+
+    par Multi-Platform Publication
+        CMS->>Make: POST webhook (Facebook)
+        Make->>Make: Use conn_fb_001
+        Make->>Facebook: Create Post
+        Facebook-->>Make: post_id: fb_789
+
+        CMS->>Make: POST webhook (Instagram)
+        Make->>Make: Use conn_ig_002
+        Make->>Instagram: Create Media
+        Instagram-->>Make: media_id: ig_456
+    end
+
+    par Callbacks
+        Make->>CMS: POST /webhooks/status
+        Note right of Make: {status: "success",<br/> external_id: "fb_789"}
+
+        Make->>CMS: POST /webhooks/status
+        Note right of Make: {status: "success",<br/> external_id: "ig_456"}
+    end
+
+    CMS->>CMS: Update publications table
+    CMS-->>User: Notification "Publié ✓"
+
+    Note over User,CMS: Analytics Collection (N8N)
+
+    loop Every Hour
+        N8N->>Facebook: GET /posts/{fb_789}/insights
+        Facebook-->>N8N: {impressions, engagement, ...}
+
+        N8N->>Instagram: GET /media/{ig_456}/insights
+        Instagram-->>N8N: {reach, likes, ...}
+
+        N8N->>CMS: POST /api/analytics
+        CMS->>CMS: Store metrics
+        CMS->>User: Update Dashboard
+    end
+                    </div>
+                </div>
+
+                <h3>6. Diagramme Entité-Relation (ERD)</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+erDiagram
+    User ||--o{ Campaign : creates
+    Agent ||--o{ SocialAccount : configures
+    Agent ||--o{ Topic : creates
+
+    Topic ||--o{ Tag : contains
+
+    Campaign ||--o{ CampaignTarget : has
+    Campaign ||--o{ CampaignObject : contains
+
+    SocialAccount ||--o{ CampaignTarget : targeted_by
+
+    CampaignObject }o--|| ObjectTarget : has_override
+    ObjectTarget }o--|| SocialAccount : targets
+
+    CampaignObject }o--o{ MediaAsset : uses
+    MediaAsset }o--o{ Tag : tagged_with
+
+    CampaignObject ||--o{ Publication : generates
+    Publication ||--o{ AnalyticsMetric : tracks
+
+    User {
+        int id PK
+        string email UK
+        string password
+        string role
+    }
+
+    Agent {
+        int id PK
+        int user_id FK
+    }
+
+    Topic {
+        int id PK
+        string name UK
+    }
+
+    Tag {
+        int id PK
+        string name UK
+        int topic_id FK
+    }
+
+    Campaign {
+        int id PK
+        string name
+        int user_id FK
+        json goals
+        decimal budget
+    }
+
+    SocialAccount {
+        int id PK
+        string platform
+        string account_name
+        bigint make_connection_id
+        bigint make_scenario_id
+        text webhook_url
+        string status
+    }
+
+    CampaignTarget {
+        int id PK
+        int campaign_id FK
+        int social_account_id FK
+        boolean is_active
+    }
+
+    CampaignObject {
+        int id PK
+        int campaign_id FK
+        string type
+        text content
+        string status
+    }
+
+    ObjectTarget {
+        int id PK
+        int object_id FK
+        int social_account_id FK
+        boolean is_override
+    }
+
+    MediaAsset {
+        int id PK
+        string filename
+        string type
+        string sharepoint_url
+    }
+
+    Publication {
+        int id PK
+        int object_id FK
+        int social_account_id FK
+        string external_id
+        string status
+        timestamp published_at
+    }
+
+    AnalyticsMetric {
+        int id PK
+        int publication_id FK
+        decimal impressions
+        decimal engagement
+        timestamp measured_at
+    }
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 9: INFRASTRUCTURE -->
+            <section id="infrastructure">
+                <h2>Infrastructure de Déploiement</h2>
+
+                <h3>Stack Production Recommandée</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Web Server</strong><br>
+                        Nginx 1.24+ (reverse proxy)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Application</strong><br>
+                        Symfony 7 + PHP-FPM 8.2
+                    </div>
+                    <div class="tech-item">
+                        <strong>Content Generation</strong><br>
+                        N8N (self-hosted Docker)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Publication</strong><br>
+                        Make.com (SaaS - API)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Database</strong><br>
+                        PostgreSQL 15+ (Master + Replica)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Cache</strong><br>
+                        Redis 7+ Cluster
+                    </div>
+                    <div class="tech-item">
+                        <strong>Queue</strong><br>
+                        RabbitMQ 3.12+ Cluster
+                    </div>
+                    <div class="tech-item">
+                        <strong>Search</strong><br>
+                        Meilisearch (Docker)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Storage</strong><br>
+                        SharePoint (Microsoft 365)
+                    </div>
+                    <div class="tech-item">
+                        <strong>CDN</strong><br>
+                        CloudFlare
+                    </div>
+                    <div class="tech-item">
+                        <strong>Monitoring</strong><br>
+                        Prometheus + Grafana + Sentry
+                    </div>
+                    <div class="tech-item">
+                        <strong>CI/CD</strong><br>
+                        GitHub Actions / GitLab CI
+                    </div>
+                </div>
+
+                <h3>Architecture Serveurs</h3>
+                <div class="module-card">
+                    <pre>
+┌─────────────────────────────────────────────┐
+│          CloudFlare CDN (Global)            │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│        Nginx Load Balancer (2x)             │
+└────┬─────────────────────┬──────────────────┘
+     │                     │
+┌────▼────────┐    ┌──────▼────────┐
+│ Symfony App │    │ Symfony App   │  (3+ instances)
+│   Server 1  │    │   Server 2    │
+└────┬────────┘    └──────┬────────┘
+     │                     │
+┌────▼─────────────────────▼────────┐
+│      RabbitMQ Cluster (3x)         │
+└────┬───────────────┬───────────────┘
+     │               │
+┌────▼────────┐  ┌──▼────────────┐
+│ N8N Workers │  │  Make.com API │
+│    (3+)     │  │   (SaaS)      │
+│  - Content  │  │  - Publication│
+│  - Analytics│  │               │
+└─────────────┘  └───────────────┘
+
+Data Layer:
+├── PostgreSQL Master + 2 Replicas
+├── Redis Cluster (3 masters + 3 replicas)
+├── Meilisearch (1 instance)
+└── SharePoint (Microsoft 365 Cloud)
+                    </pre>
+                </div>
+
+                <h3>Sizing Recommandé (Production)</h3>
+                <div class="module-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>Storage</th>
+                                <th>Instances</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Symfony App</strong></td>
+                                <td>4 vCPU</td>
+                                <td>8 GB</td>
+                                <td>50 GB SSD</td>
+                                <td>3+</td>
+                            </tr>
+                            <tr>
+                                <td><strong>N8N Worker</strong></td>
+                                <td>4 vCPU</td>
+                                <td>8 GB</td>
+                                <td>100 GB SSD</td>
+                                <td>3+</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PostgreSQL</strong></td>
+                                <td>8 vCPU</td>
+                                <td>32 GB</td>
+                                <td>500 GB SSD</td>
+                                <td>1 master + 2 replicas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Redis</strong></td>
+                                <td>2 vCPU</td>
+                                <td>8 GB</td>
+                                <td>50 GB SSD</td>
+                                <td>6 (3 masters + 3 replicas)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RabbitMQ</strong></td>
+                                <td>2 vCPU</td>
+                                <td>4 GB</td>
+                                <td>100 GB SSD</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Meilisearch</strong></td>
+                                <td>2 vCPU</td>
+                                <td>4 GB</td>
+                                <td>100 GB SSD</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SharePoint</strong></td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>Microsoft 365</td>
+                                <td>Cloud (SaaS)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Make.com</strong></td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>Cloud (SaaS)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Environnements</h3>
+                <div class="vision-grid">
+                    <div class="vision-card">
+                        <h4>Development</h4>
+                        <ul class="features-list">
+                            <li>Docker Compose local</li>
+                            <li>Tous services containerisés</li>
+                            <li>Symfony dev mode</li>
+                            <li>N8N local avec workflows test</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Staging</h4>
+                        <ul class="features-list">
+                            <li>Réplique exacte de production</li>
+                            <li>SharePoint staging site</li>
+                            <li>Make.com test scenarios</li>
+                            <li>Tests E2E automatisés</li>
+                        </ul>
+                    </div>
+
+                    <div class="vision-card">
+                        <h4>Production</h4>
+                        <ul class="features-list">
+                            <li>Haute disponibilité (HA)</li>
+                            <li>Auto-scaling Symfony apps</li>
+                            <li>Monitoring 24/7</li>
+                            <li>Backups automatiques</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 10: IMPLEMENTATION -->
+            <section id="implementation">
+                <h2>Plan d'Implémentation</h2>
+
+                <div class="phase-grid">
+                    <div class="phase-card">
+                        <h3>Phase 1: Fondations (MVP)</h3>
+                        <p><strong>Durée estimée : 2-3 mois</strong></p>
+                        <ul>
+                            <li>✓ Auth & RBAC (Symfony Security)</li>
+                            <li>✓ Configuration comptes via Make.com API</li>
+                            <li>✓ Topics & Tags management</li>
+                            <li>✓ Upload manuel SharePoint</li>
+                            <li>✓ Création campagne basique</li>
+                            <li>✓ Affectation niveau campagne</li>
+                            <li>✓ CMS objets (post, image)</li>
+                            <li>✓ Make.com: Publication Facebook uniquement</li>
+                            <li>✓ Analytics basiques (views, likes)</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 2: Multi-Platform</h3>
+                        <p><strong>Durée estimée : 2 mois</strong></p>
+                        <ul>
+                            <li>✓ Affectation niveau objet (override)</li>
+                            <li>✓ Make.com: YouTube, Instagram, TikTok</li>
+                            <li>✓ WordPress integration</li>
+                            <li>✓ N8N: Image processing workflows</li>
+                            <li>✓ N8N: Video generation basique</li>
+                            <li>✓ Workflow approbation (Symfony Workflow)</li>
+                            <li>✓ Planification temporelle</li>
+                            <li>✓ Analytics multi-plateformes (N8N)</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 3: IA & Automation</h3>
+                        <p><strong>Durée estimée : 2-3 mois</strong></p>
+                        <ul>
+                            <li>✓ Sourcing automatique (N8N + APIs)</li>
+                            <li>✓ Classification IA (OpenAI/Claude)</li>
+                            <li>✓ N8N: Text generation (GPT)</li>
+                            <li>✓ N8N: Video assembly avancé</li>
+                            <li>✓ Make.com: Twitter/X, LinkedIn</li>
+                            <li>✓ Ad campaigns (Facebook Ads)</li>
+                            <li>✓ Analytics prédictifs</li>
+                            <li>✓ Recommandations IA</li>
+                            <li>✓ Meilisearch integration complète</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h3>Phase 4: Enterprise</h3>
+                        <p><strong>Durée estimée : 2 mois</strong></p>
+                        <ul>
+                            <li>✓ Multi-workspace</li>
+                            <li>✓ Collaboration équipe avancée</li>
+                            <li>✓ White-label</li>
+                            <li>✓ API publique (API Platform)</li>
+                            <li>✓ Webhooks externes</li>
+                            <li>✓ Reporting avancé (PDF, Excel)</li>
+                            <li>✓ A/B Testing</li>
+                            <li>✓ Advanced monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Technologies & Outils par Phase</h3>
+                <div class="module-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Phase</th>
+                                <th>Backend</th>
+                                <th>Automation</th>
+                                <th>Intégrations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phase 1</strong></td>
+                                <td>Symfony 7, PostgreSQL, Redis</td>
+                                <td>Make.com API, Basic N8N</td>
+                                <td>Facebook (Make), SharePoint</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 2</strong></td>
+                                <td>+ Meilisearch, RabbitMQ</td>
+                                <td>+ N8N Image/Video, Make multi-platform</td>
+                                <td>+ YouTube, Instagram, WordPress</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 3</strong></td>
+                                <td>+ Symfony Messenger, API Platform</td>
+                                <td>+ N8N AI (OpenAI), Advanced workflows</td>
+                                <td>+ OpenAI API, Unsplash, Pexels</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 4</strong></td>
+                                <td>+ GraphQL, Advanced RBAC</td>
+                                <td>+ N8N Analytics AI, A/B Testing</td>
+                                <td>+ Twitter, LinkedIn, Google Ads</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Prochaines Étapes Immédiates</h3>
+
+                <div class="info-box">
+                    <h4>Actions Prioritaires</h4>
+                    <ol>
+                        <li><strong>Validation Architecturale</strong> - Revue avec stakeholders et équipe technique</li>
+                        <li><strong>Setup Environnement Dev</strong> - Docker Compose avec tous les services</li>
+                        <li><strong>Compte Make.com Team</strong> - Créer et configurer compte Make</li>
+                        <li><strong>SharePoint Site Setup</strong> - Configurer site SharePoint + Graph API</li>
+                        <li><strong>POC Make.com</strong> - Test OAuth + création scénario Facebook</li>
+                        <li><strong>POC N8N</strong> - Test workflow génération vidéo basique</li>
+                        <li><strong>Initialisation Symfony</strong> - Structure projet avec modules de base</li>
+                        <li><strong>Sprint 1 Planning</strong> - Découpage détaillé Phase 1 en sprints 2 semaines</li>
+                        <li><strong>Documentation API</strong> - Spécifications OpenAPI pour Make API service</li>
+                    </ol>
+                </div>
+
+                <div class="success-box">
+                    <h4>Livrables du Cahier des Charges</h4>
+                    <ul class="features-list">
+                        <li>✓ Architecture système complète (N8N + Make.com)</li>
+                        <li>✓ Spécifications fonctionnelles détaillées</li>
+                        <li>✓ 6 diagrammes d'architecture (Mermaid)</li>
+                        <li>✓ Stack technologique validée (SharePoint, Meilisearch)</li>
+                        <li>✓ 7 Modules détaillés avec features complètes</li>
+                        <li>✓ Sécurité & Conformité RGPD</li>
+                        <li>✓ Infrastructure de déploiement avec sizing</li>
+                        <li>✓ Plan d'implémentation en 4 phases</li>
+                        <li>✓ Flux Make.com avec scénarios templates</li>
+                        <li>✓ Workflows N8N pour génération de contenu</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p><strong>Cahier des Charges Technique Complet</strong></p>
+            <p>CMS de Gestion de Campagnes de Contenu Média Multi-Canal</p>
+            <p style="margin-top: 1rem;">Architecture Symfony 7 + N8N (Génération) + Make.com (Publication)</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">Version 3.0 Finale - Document généré le 15 février 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#764ba2',
+                lineColor: '#667eea',
+                secondaryColor: '#764ba2',
+                tertiaryColor: '#f7fafc',
+                fontSize: '14px'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true,
+                diagramMarginX: 50,
+                diagramMarginY: 10
+            },
+            er: {
+                useMaxWidth: true
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>

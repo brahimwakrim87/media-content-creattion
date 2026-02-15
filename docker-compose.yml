@@ -1,0 +1,121 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./backend/public:/var/www/backend/public:ro
+    depends_on:
+      php-fpm:
+        condition: service_started
+      next-app:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./backend:/var/www/backend
+    env_file: .env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  messenger-worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=128M
+    volumes:
+      - ./backend:/var/www/backend
+    env_file: .env.docker
+    depends_on:
+      php-fpm:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  next-app:
+    build:
+      context: .
+      dockerfile: docker/next/Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NEXT_PUBLIC_API_URL: "/api"
+      NEXT_PUBLIC_DOMAIN: "mmc.ilinqsoft.com"
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: dmcc_db
+      POSTGRES_USER: dmcc_app
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-Ch4ng3M3S3cur3P4ss}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dmcc_app -d dmcc_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: "${N8N_AUTH_USER:-admin}"
+      N8N_BASIC_AUTH_PASSWORD: "${N8N_AUTH_PASSWORD:-N8nAdm1nS3cur3}"
+      WEBHOOK_URL: "https://mmc.ilinqsoft.com/n8n/"
+      N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY:-n8n-enc-key-change-me}"
+      N8N_HOST: "mmc.ilinqsoft.com"
+      N8N_PROTOCOL: "https"
+    restart: unless-stopped
+    networks:
+      - dmcc
+
+volumes:
+  pg_data:
+  redis_data:
+  n8n_data:
+
+networks:
+  dmcc:
+    driver: bridge

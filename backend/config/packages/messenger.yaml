@@ -1,0 +1,23 @@
+framework:
+    messenger:
+        failure_transport: failed
+        transports:
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    stream: messages
+                    group: dmcc
+                    consumer: worker
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+            failed:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    stream: failed_messages
+                    group: dmcc
+                    consumer: worker
+        routing:
+            App\Message\SendNotification: async
+            App\Message\CollectAnalytics: async

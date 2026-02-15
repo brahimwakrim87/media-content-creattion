@@ -1,0 +1,21 @@
+# Claude Code
+.claude/
+
+# Environment files with secrets
+.env.local
+.env.*.local
+.env.docker.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SSH keys
+*.pem
+docker/ssh/
