@@ -25,6 +25,8 @@ security:
             pattern: ^/api/
             stateless: true
             jwt: ~
+            refresh_jwt:
+                check_path: api_token_refresh
 
     access_control:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
