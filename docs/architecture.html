@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Marketing Campaign Management System — Technical Architecture</title>
+<style>
+  :root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-bg: #eff6ff;
+    --accent: #059669;
+    --accent-bg: #ecfdf5;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --bg: #ffffff;
+    --bg-alt: #f8fafc;
+    --code-bg: #f1f5f9;
+    --danger: #dc2626;
+    --warning: #d97706;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    background: var(--bg-alt);
+  }
+
+  .page-wrapper {
+    max-width: 1140px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    box-shadow: 0 0 40px rgba(0,0,0,0.06);
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+    color: #fff;
+    padding: 48px 56px 40px;
+  }
+
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  header .subtitle {
+    font-size: 15px;
+    opacity: 0.85;
+    font-weight: 400;
+  }
+
+  header .meta {
+    margin-top: 20px;
+    font-size: 13px;
+    opacity: 0.7;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .content { padding: 40px 56px 64px; }
+
+  /* Table of Contents */
+  .toc {
+    background: var(--primary-bg);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+
+  .toc h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-section;
+  }
+
+  .toc > ol > li {
+    counter-increment: toc-section;
+    margin-bottom: 6px;
+  }
+
+  .toc > ol > li::before {
+    content: counter(toc-section) ". ";
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .toc a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .toc a:hover { text-decoration: underline; }
+
+  .toc .toc-sub {
+    list-style: none;
+    padding-left: 24px;
+    margin-top: 4px;
+    counter-reset: toc-sub;
+  }
+
+  .toc .toc-sub li {
+    counter-increment: toc-sub;
+    margin-bottom: 3px;
+  }
+
+  .toc .toc-sub li a { font-weight: 400; font-size: 13px; color: var(--text-muted); }
+  .toc .toc-sub li a:hover { color: var(--primary); }
+
+  /* Sections */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  h2.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 10px;
+    margin-bottom: 28px;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 28px 0 14px;
+    scroll-margin-top: 24px;
+  }
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  p { margin-bottom: 14px; font-size: 14px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child { border-radius: 0 6px 0 0; }
+
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) { background: var(--bg-alt); }
+  tbody tr:hover { background: #e0f2fe; }
+
+  /* Code / SQL */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 16px 0 24px;
+    color: #334155;
+  }
+
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #be185d;
+  }
+
+  /* Diagram */
+  .diagram {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0 28px;
+    overflow-x: auto;
+  }
+
+  .diagram pre {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+
+  /* Badges / Pills */
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .badge-must { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+  .badge-should { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
+  .badge-could { background: var(--accent-bg); color: var(--accent); border: 1px solid #a7f3d0; }
+  .badge-info { background: var(--primary-bg); color: var(--primary); border: 1px solid #bfdbfe; }
+
+  /* Notes / Callouts */
+  .note {
+    background: var(--primary-bg);
+    border-left: 4px solid var(--primary-light);
+    padding: 14px 20px;
+    margin: 16px 0 24px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+  }
+
+  .note-accent {
+    background: var(--accent-bg);
+    border-left-color: var(--accent);
+  }
+
+  .note strong { color: var(--primary); }
+  .note-accent strong { color: var(--accent); }
+
+  /* Lists */
+  ul, ol {
+    margin: 8px 0 16px 20px;
+    font-size: 14px;
+  }
+
+  li { margin-bottom: 5px; }
+
+  /* Separator */
+  hr {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Schema Group Header */
+  .schema-group {
+    background: linear-gradient(135deg, var(--primary-bg), #dbeafe);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 24px 0 12px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+  }
+
+  /* Phase cards */
+  .phase-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  .phase-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+    color: #fff;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .phase-header .weeks {
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .phase-body {
+    padding: 16px 20px;
+    font-size: 13px;
+  }
+
+  .phase-body ul { margin: 6px 0 0 16px; }
+
+  .deps {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .deps strong { color: var(--primary); }
+
+  /* Footer */
+  footer {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    padding: 24px 56px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Print */
+  @media print {
+    body { background: #fff; }
+    .page-wrapper { box-shadow: none; }
+    header { padding: 24px 32px 20px; }
+    .content { padding: 20px 32px; }
+    pre { font-size: 10px; }
+    .section { page-break-inside: avoid; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    header, .content, footer { padding-left: 24px; padding-right: 24px; }
+    header h1 { font-size: 22px; }
+    pre { font-size: 11px; padding: 12px; }
+    table { font-size: 11px; }
+    thead th, tbody td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+<!-- ============================== HEADER ============================== -->
+<header>
+  <h1>Digital Marketing Campaign Management System</h1>
+  <div class="subtitle">Technical Architecture &amp; Implementation Plan</div>
+  <div class="meta">
+    <span>Version 1.0</span>
+    <span>February 2026</span>
+    <span>Symfony 7 &middot; Next.js 15 &middot; PostgreSQL 16 &middot; Docker</span>
+  </div>
+</header>
+
+<div class="content">
+
+<!-- ======================== TABLE OF CONTENTS ========================= -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li>
+      <a href="#data-model">Data Model &amp; Database Schema</a>
+      <ol class="toc-sub">
+        <li><a href="#schema-overview">Schema Overview</a></li>
+        <li><a href="#schema-core">Core / RBAC Tables</a></li>
+        <li><a href="#schema-campaign">Campaign Tables</a></li>
+        <li><a href="#schema-cms">Content (CMS) Tables</a></li>
+        <li><a href="#schema-ai">AI Generation Tables</a></li>
+        <li><a href="#schema-publication">Publication Tables</a></li>
+        <li><a href="#schema-analytics">Analytics Tables</a></li>
+        <li><a href="#schema-system">System Tables</a></li>
+        <li><a href="#schema-integration">Integration Tables</a></li>
+        <li><a href="#schema-erd">Entity Relationship Diagram</a></li>
+        <li><a href="#schema-migration">Migration Strategy</a></li>
+      </ol>
+    </li>
+    <li>
+      <a href="#architecture">Software Architecture</a>
+      <ol class="toc-sub">
+        <li><a href="#arch-overview">System Overview</a></li>
+        <li><a href="#arch-backend">Backend (Symfony 7)</a></li>
+        <li><a href="#arch-frontend">Frontend (Next.js 15)</a></li>
+        <li><a href="#arch-n8n">n8n Integration Layer</a></li>
+        <li><a href="#arch-make">Make.com Integration</a></li>
+        <li><a href="#arch-infra">Infrastructure (Docker Compose)</a></li>
+        <li><a href="#arch-auth">Authentication &amp; Authorization</a></li>
+        <li><a href="#arch-flows">Integration Flows</a></li>
+        <li><a href="#arch-nfr">Non-Functional Requirements Mapping</a></li>
+      </ol>
+    </li>
+    <li>
+      <a href="#tech-stack">Technology Stack</a>
+      <ol class="toc-sub">
+        <li><a href="#stack-backend">Backend</a></li>
+        <li><a href="#stack-frontend">Frontend</a></li>
+        <li><a href="#stack-infra">Infrastructure</a></li>
+        <li><a href="#stack-testing">Testing &amp; Quality</a></li>
+      </ol>
+    </li>
+    <li>
+      <a href="#dev-plan">Development Plan</a>
+      <ol class="toc-sub">
+        <li><a href="#plan-overview">Phase Overview</a></li>
+        <li><a href="#plan-phases">Detailed Phases</a></li>
+        <li><a href="#plan-risks">Risks &amp; Mitigations</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+
+<!-- ==================== SECTION 1: DATA MODEL ======================== -->
+<section class="section" id="data-model">
+  <h2 class="section-title">1. Data Model &amp; Database Schema</h2>
+
+  <h3 id="schema-overview">1.1 Schema Overview</h3>
+  <p>The database is organized into 8 schema groups comprising 32 tables (including junction tables). All tables use <code>UUID</code> primary keys (generated via <code>gen_random_uuid()</code>) and <code>TIMESTAMPTZ</code> for temporal columns. Soft-delete is implemented via <code>deleted_at</code> columns where appropriate.</p>
+
+  <table>
+    <thead>
+      <tr><th>Group</th><th>Tables</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Core / RBAC</td><td>7</td><td>Users, social login, roles, permissions, refresh tokens</td></tr>
+      <tr><td>Campaign</td><td>7</td><td>Campaigns, audiences, websites, channel accounts, junction tables</td></tr>
+      <tr><td>Content (CMS)</td><td>6</td><td>Content items, versions, media, ads, reviews</td></tr>
+      <tr><td>AI Generation</td><td>1</td><td>AI content generation job tracking</td></tr>
+      <tr><td>Publication</td><td>2</td><td>Publication records and execution logs</td></tr>
+      <tr><td>Analytics</td><td>4</td><td>Engagement metrics, ad performance, backlinks, alerts</td></tr>
+      <tr><td>System</td><td>3</td><td>Audit log, settings, notifications</td></tr>
+      <tr><td>Integration</td><td>2</td><td>n8n workflow executions, Make.com webhook logs</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ===== CORE / RBAC ===== -->
+  <div class="schema-group" id="schema-core">1.2 Core / RBAC Tables</div>
+
+<pre>
+-- =============================================================
+-- CORE / RBAC
+-- =============================================================
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE "user" (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email           VARCHAR(255) NOT NULL UNIQUE,
+    password_hash   VARCHAR(255),                -- NULL when registered via social login only
+    first_name      VARCHAR(100) NOT NULL,
+    last_name       VARCHAR(100) NOT NULL,
+    avatar_url      VARCHAR(500),
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    email_verified  BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMPTZ
+);
+CREATE INDEX idx_user_email ON "user" (email);
+CREATE INDEX idx_user_active ON "user" (is_active) WHERE deleted_at IS NULL;
+
+CREATE TABLE user_social_auth (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id             UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    provider            VARCHAR(50) NOT NULL,       -- 'facebook', 'google', 'microsoft', 'twitter'
+    provider_user_id    VARCHAR(255) NOT NULL,
+    access_token        TEXT,                        -- encrypted via libsodium
+    refresh_token       TEXT,                        -- encrypted via libsodium
+    token_expires_at    TIMESTAMPTZ,
+    profile_data        JSONB,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(provider, provider_user_id)
+);
+CREATE INDEX idx_user_social_auth_user ON user_social_auth (user_id);
+CREATE INDEX idx_user_social_auth_provider ON user_social_auth (provider, provider_user_id);
+
+CREATE TABLE role (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(50) NOT NULL UNIQUE,        -- 'admin', 'manager', 'editor', 'viewer'
+    description VARCHAR(255),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE permission (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(100) NOT NULL UNIQUE,       -- 'campaign.create', 'content.publish', etc.
+    description VARCHAR(255),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE role_permission (
+    role_id       UUID NOT NULL REFERENCES role(id) ON DELETE CASCADE,
+    permission_id UUID NOT NULL REFERENCES permission(id) ON DELETE CASCADE,
+    PRIMARY KEY (role_id, permission_id)
+);
+
+CREATE TABLE user_role (
+    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES role(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
+);
+
+CREATE TABLE refresh_token (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    token       VARCHAR(500) NOT NULL UNIQUE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    revoked     BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_refresh_token_user ON refresh_token (user_id);
+CREATE INDEX idx_refresh_token_expires ON refresh_token (expires_at) WHERE revoked = FALSE;
+</pre>
+
+  <!-- ===== CAMPAIGN ===== -->
+  <div class="schema-group" id="schema-campaign">1.3 Campaign Tables</div>
+
+<pre>
+-- =============================================================
+-- CAMPAIGN
+-- =============================================================
+
+CREATE TABLE campaign (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id        UUID NOT NULL REFERENCES "user"(id),
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'draft',   -- draft, active, paused, completed, archived
+    start_date      DATE,
+    end_date        DATE,
+    budget          NUMERIC(12, 2),
+    currency        VARCHAR(3) DEFAULT 'USD',
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMPTZ
+);
+CREATE INDEX idx_campaign_owner ON campaign (owner_id);
+CREATE INDEX idx_campaign_status ON campaign (status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_campaign_dates ON campaign (start_date, end_date);
+
+CREATE TABLE target_audience (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT,
+    age_min         SMALLINT,
+    age_max         SMALLINT,
+    genders         VARCHAR(50)[],                   -- ARRAY of gender values
+    locations       JSONB,                           -- [{country, region, city}]
+    interests       TEXT[],
+    languages       VARCHAR(10)[],
+    created_by      UUID NOT NULL REFERENCES "user"(id),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_target_audience_creator ON target_audience (created_by);
+
+CREATE TABLE campaign_target_audience (
+    campaign_id         UUID NOT NULL REFERENCES campaign(id) ON DELETE CASCADE,
+    target_audience_id  UUID NOT NULL REFERENCES target_audience(id) ON DELETE CASCADE,
+    PRIMARY KEY (campaign_id, target_audience_id)
+);
+
+CREATE TABLE website (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(255) NOT NULL,
+    url         VARCHAR(500) NOT NULL,
+    api_endpoint VARCHAR(500),
+    api_key     TEXT,                                -- encrypted via libsodium
+    cms_type    VARCHAR(50),                         -- 'wordpress', 'drupal', 'custom'
+    owner_id    UUID NOT NULL REFERENCES "user"(id),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE campaign_website (
+    campaign_id UUID NOT NULL REFERENCES campaign(id) ON DELETE CASCADE,
+    website_id  UUID NOT NULL REFERENCES website(id) ON DELETE CASCADE,
+    PRIMARY KEY (campaign_id, website_id)
+);
+
+CREATE TABLE channel_account (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id        UUID NOT NULL REFERENCES "user"(id),
+    platform        VARCHAR(30) NOT NULL,            -- 'facebook', 'twitter', 'instagram', 'whatsapp'
+    account_name    VARCHAR(255) NOT NULL,
+    account_id      VARCHAR(255),                    -- platform-specific account/page ID
+    access_token    TEXT,                             -- encrypted via libsodium
+    refresh_token   TEXT,                             -- encrypted via libsodium
+    token_expires_at TIMESTAMPTZ,
+    status          VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, connected, expired, revoked
+    metadata        JSONB,                           -- platform-specific data (page ID, permissions, etc.)
+    connected_via   VARCHAR(20) DEFAULT 'make',      -- 'make' (Make.com OAuth) or 'manual'
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_channel_account_owner ON channel_account (owner_id);
+CREATE INDEX idx_channel_account_platform ON channel_account (platform, status);
+
+CREATE TABLE campaign_channel (
+    campaign_id         UUID NOT NULL REFERENCES campaign(id) ON DELETE CASCADE,
+    channel_account_id  UUID NOT NULL REFERENCES channel_account(id) ON DELETE CASCADE,
+    PRIMARY KEY (campaign_id, channel_account_id)
+);
+</pre>
+
+  <!-- ===== CONTENT (CMS) ===== -->
+  <div class="schema-group" id="schema-cms">1.4 Content (CMS) Tables</div>
+
+<pre>
+-- =============================================================
+-- CONTENT (CMS)
+-- =============================================================
+
+CREATE TABLE content (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    campaign_id     UUID NOT NULL REFERENCES campaign(id),
+    type            VARCHAR(20) NOT NULL,            -- 'article', 'post', 'ad'
+    title           VARCHAR(500),
+    body            TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'draft', -- draft, in_review, approved, published, archived
+    current_version INT NOT NULL DEFAULT 1,
+    seo_title       VARCHAR(200),
+    seo_description VARCHAR(500),
+    seo_keywords    TEXT[],
+    scheduled_at    TIMESTAMPTZ,
+    author_id       UUID NOT NULL REFERENCES "user"(id),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMPTZ
+);
+CREATE INDEX idx_content_campaign ON content (campaign_id);
+CREATE INDEX idx_content_type_status ON content (type, status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_content_author ON content (author_id);
+CREATE INDEX idx_content_scheduled ON content (scheduled_at) WHERE status = 'approved' AND scheduled_at IS NOT NULL;
+
+CREATE TABLE content_version (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id  UUID NOT NULL REFERENCES content(id) ON DELETE CASCADE,
+    version     INT NOT NULL,
+    title       VARCHAR(500),
+    body        TEXT,
+    change_note VARCHAR(500),
+    created_by  UUID NOT NULL REFERENCES "user"(id),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(content_id, version)
+);
+CREATE INDEX idx_content_version_content ON content_version (content_id, version DESC);
+
+CREATE TABLE media_asset (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    filename        VARCHAR(500) NOT NULL,
+    original_name   VARCHAR(500) NOT NULL,
+    mime_type       VARCHAR(100) NOT NULL,
+    file_size       BIGINT NOT NULL,                 -- bytes
+    storage_path    VARCHAR(1000) NOT NULL,
+    storage_disk    VARCHAR(50) NOT NULL DEFAULT 'local', -- 'local', 's3'
+    width           INT,
+    height          INT,
+    duration        INT,                             -- seconds (for video/audio)
+    alt_text        VARCHAR(500),
+    uploaded_by     UUID NOT NULL REFERENCES "user"(id),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_media_asset_uploader ON media_asset (uploaded_by);
+
+CREATE TABLE content_media (
+    content_id      UUID NOT NULL REFERENCES content(id) ON DELETE CASCADE,
+    media_asset_id  UUID NOT NULL REFERENCES media_asset(id) ON DELETE CASCADE,
+    position        INT NOT NULL DEFAULT 0,
+    role            VARCHAR(30) DEFAULT 'attachment', -- 'featured', 'attachment', 'gallery', 'thumbnail'
+    PRIMARY KEY (content_id, media_asset_id)
+);
+
+CREATE TABLE ad_config (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id      UUID NOT NULL REFERENCES content(id) ON DELETE CASCADE UNIQUE,
+    headline        VARCHAR(255),
+    cta_text        VARCHAR(100),                    -- 'Shop Now', 'Learn More', etc.
+    cta_url         VARCHAR(500),
+    format          VARCHAR(30) NOT NULL,            -- 'single_image', 'carousel', 'video', 'story'
+    budget          NUMERIC(10, 2),
+    bid_strategy    VARCHAR(30),                     -- 'lowest_cost', 'target_cost', 'bid_cap'
+    bid_amount      NUMERIC(10, 2),
+    ab_variant      VARCHAR(10),                     -- 'A', 'B', etc.
+    ab_group_id     UUID,                            -- links A/B variants together
+    platform_config JSONB,                           -- platform-specific ad settings
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE content_review (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id  UUID NOT NULL REFERENCES content(id) ON DELETE CASCADE,
+    reviewer_id UUID NOT NULL REFERENCES "user"(id),
+    status      VARCHAR(20) NOT NULL,                -- 'pending', 'approved', 'rejected', 'changes_requested'
+    comment     TEXT,
+    version     INT NOT NULL,                        -- which version was reviewed
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_content_review_content ON content_review (content_id);
+</pre>
+
+  <!-- ===== AI GENERATION ===== -->
+  <div class="schema-group" id="schema-ai">1.5 AI Generation Tables</div>
+
+<pre>
+-- =============================================================
+-- AI GENERATION
+-- =============================================================
+
+CREATE TABLE ai_generation_job (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    requested_by    UUID NOT NULL REFERENCES "user"(id),
+    content_id      UUID REFERENCES content(id),     -- optional: link to content being generated for
+    type            VARCHAR(30) NOT NULL,             -- 'text', 'image', 'video'
+    provider        VARCHAR(50),                      -- 'openai', 'claude', 'stability_ai', 'dall_e'
+    prompt          TEXT NOT NULL,
+    parameters      JSONB,                           -- model-specific parameters (temperature, style, etc.)
+    status          VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, processing, completed, failed
+    result_url      VARCHAR(1000),                   -- URL/path to generated content
+    result_text     TEXT,                             -- generated text content
+    result_metadata JSONB,                           -- tokens used, generation time, etc.
+    error_message   TEXT,
+    n8n_execution_id VARCHAR(255),                   -- reference to n8n workflow execution
+    started_at      TIMESTAMPTZ,
+    completed_at    TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_ai_job_user ON ai_generation_job (requested_by);
+CREATE INDEX idx_ai_job_status ON ai_generation_job (status);
+CREATE INDEX idx_ai_job_content ON ai_generation_job (content_id) WHERE content_id IS NOT NULL;
+</pre>
+
+  <!-- ===== PUBLICATION ===== -->
+  <div class="schema-group" id="schema-publication">1.6 Publication Tables</div>
+
+<pre>
+-- =============================================================
+-- PUBLICATION
+-- =============================================================
+
+CREATE TABLE publication (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id          UUID NOT NULL REFERENCES content(id),
+    channel_account_id  UUID REFERENCES channel_account(id),    -- NULL for website publications
+    website_id          UUID REFERENCES website(id),             -- NULL for social media publications
+    status              VARCHAR(20) NOT NULL DEFAULT 'pending',  -- pending, publishing, published, failed, retracted
+    external_post_id    VARCHAR(500),                            -- platform-specific post/article ID
+    external_url        VARCHAR(1000),                           -- URL on the platform
+    scheduled_at        TIMESTAMPTZ,
+    published_at        TIMESTAMPTZ,
+    retry_count         INT NOT NULL DEFAULT 0,
+    max_retries         INT NOT NULL DEFAULT 3,
+    error_message       TEXT,
+    n8n_execution_id    VARCHAR(255),                            -- reference to n8n workflow execution
+    published_by        UUID NOT NULL REFERENCES "user"(id),
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_publication_target CHECK (
+        (channel_account_id IS NOT NULL AND website_id IS NULL) OR
+        (channel_account_id IS NULL AND website_id IS NOT NULL)
+    )
+);
+CREATE INDEX idx_publication_content ON publication (content_id);
+CREATE INDEX idx_publication_channel ON publication (channel_account_id) WHERE channel_account_id IS NOT NULL;
+CREATE INDEX idx_publication_status ON publication (status);
+CREATE INDEX idx_publication_scheduled ON publication (scheduled_at) WHERE status = 'pending' AND scheduled_at IS NOT NULL;
+
+CREATE TABLE publication_log (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    publication_id  UUID NOT NULL REFERENCES publication(id) ON DELETE CASCADE,
+    action          VARCHAR(30) NOT NULL,            -- 'created', 'submitted', 'published', 'failed', 'retried', 'retracted'
+    details         JSONB,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_publication_log_pub ON publication_log (publication_id, created_at DESC);
+</pre>
+
+  <!-- ===== ANALYTICS ===== -->
+  <div class="schema-group" id="schema-analytics">1.7 Analytics Tables</div>
+
+<pre>
+-- =============================================================
+-- ANALYTICS
+-- =============================================================
+
+CREATE TABLE analytics_record (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    publication_id  UUID NOT NULL REFERENCES publication(id),
+    metric_date     DATE NOT NULL,
+    views           INT NOT NULL DEFAULT 0,
+    likes           INT NOT NULL DEFAULT 0,
+    shares          INT NOT NULL DEFAULT 0,
+    comments        INT NOT NULL DEFAULT 0,
+    clicks          INT NOT NULL DEFAULT 0,
+    impressions     INT NOT NULL DEFAULT 0,
+    reach           INT NOT NULL DEFAULT 0,
+    raw_data        JSONB,                           -- full platform-specific metrics
+    collected_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(publication_id, metric_date)
+);
+CREATE INDEX idx_analytics_publication ON analytics_record (publication_id, metric_date DESC);
+CREATE INDEX idx_analytics_date ON analytics_record (metric_date);
+
+CREATE TABLE ad_performance (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    publication_id  UUID NOT NULL REFERENCES publication(id),
+    metric_date     DATE NOT NULL,
+    impressions     INT NOT NULL DEFAULT 0,
+    clicks          INT NOT NULL DEFAULT 0,
+    ctr             NUMERIC(5, 4),                   -- click-through rate
+    conversions     INT NOT NULL DEFAULT 0,
+    conversion_rate NUMERIC(5, 4),
+    spend           NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    cpa             NUMERIC(10, 2),                  -- cost per acquisition
+    roas            NUMERIC(8, 4),                   -- return on ad spend
+    raw_data        JSONB,
+    collected_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(publication_id, metric_date)
+);
+CREATE INDEX idx_ad_perf_publication ON ad_performance (publication_id, metric_date DESC);
+
+CREATE TABLE backlink (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id      UUID NOT NULL REFERENCES content(id),
+    source_url      VARCHAR(1000) NOT NULL,
+    destination_url VARCHAR(1000) NOT NULL,
+    anchor_text     VARCHAR(500),
+    domain_authority SMALLINT,                       -- 0-100
+    is_dofollow     BOOLEAN DEFAULT TRUE,
+    first_seen_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_checked_at TIMESTAMPTZ,
+    status          VARCHAR(20) NOT NULL DEFAULT 'active', -- active, lost, broken
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_backlink_content ON backlink (content_id);
+CREATE INDEX idx_backlink_status ON backlink (status);
+
+CREATE TABLE analytics_alert (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID NOT NULL REFERENCES "user"(id),
+    type            VARCHAR(50) NOT NULL,            -- 'backlink_drop', 'performance_drop', 'budget_exceeded'
+    metric          VARCHAR(50) NOT NULL,
+    threshold_value NUMERIC(12, 2) NOT NULL,
+    comparison      VARCHAR(10) NOT NULL DEFAULT 'below', -- 'below', 'above'
+    campaign_id     UUID REFERENCES campaign(id),
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    last_triggered  TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_analytics_alert_user ON analytics_alert (user_id) WHERE is_active = TRUE;
+</pre>
+
+  <!-- ===== SYSTEM ===== -->
+  <div class="schema-group" id="schema-system">1.8 System Tables</div>
+
+<pre>
+-- =============================================================
+-- SYSTEM
+-- =============================================================
+
+-- Partitioned by month for performance
+CREATE TABLE audit_log (
+    id          UUID NOT NULL DEFAULT gen_random_uuid(),
+    user_id     UUID REFERENCES "user"(id),
+    action      VARCHAR(50) NOT NULL,                -- 'create', 'update', 'delete', 'login', 'publish', etc.
+    entity_type VARCHAR(50) NOT NULL,                -- 'campaign', 'content', 'publication', etc.
+    entity_id   UUID,
+    old_values  JSONB,
+    new_values  JSONB,
+    ip_address  INET,
+    user_agent  VARCHAR(500),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
+
+-- Create partitions (example for 2026)
+CREATE TABLE audit_log_2026_01 PARTITION OF audit_log
+    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+CREATE TABLE audit_log_2026_02 PARTITION OF audit_log
+    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
+CREATE TABLE audit_log_2026_03 PARTITION OF audit_log
+    FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
+-- ... additional partitions created via scheduled job or migration
+
+CREATE INDEX idx_audit_log_user ON audit_log (user_id, created_at DESC);
+CREATE INDEX idx_audit_log_entity ON audit_log (entity_type, entity_id);
+
+CREATE TABLE system_setting (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key         VARCHAR(100) NOT NULL UNIQUE,
+    value       TEXT NOT NULL,
+    type        VARCHAR(20) NOT NULL DEFAULT 'string', -- 'string', 'integer', 'boolean', 'json'
+    description VARCHAR(500),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE notification (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    type        VARCHAR(50) NOT NULL,                -- 'publication_success', 'publication_failed', 'review_requested', etc.
+    title       VARCHAR(255) NOT NULL,
+    message     TEXT,
+    data        JSONB,                               -- context-specific payload
+    is_read     BOOLEAN NOT NULL DEFAULT FALSE,
+    read_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_notification_user_unread ON notification (user_id, created_at DESC) WHERE is_read = FALSE;
+</pre>
+
+  <!-- ===== INTEGRATION ===== -->
+  <div class="schema-group" id="schema-integration">1.9 Integration Tables</div>
+
+<pre>
+-- =============================================================
+-- INTEGRATION
+-- =============================================================
+
+CREATE TABLE n8n_workflow_execution (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    n8n_execution_id    VARCHAR(255) NOT NULL UNIQUE,
+    workflow_name       VARCHAR(255) NOT NULL,        -- 'publish_facebook', 'generate_text', etc.
+    trigger_type        VARCHAR(30) NOT NULL,         -- 'publish', 'ai_generation', 'analytics_collect'
+    trigger_entity_id   UUID,                         -- ID of the publication or ai_generation_job
+    status              VARCHAR(20) NOT NULL DEFAULT 'running', -- running, success, failed, timeout
+    input_payload       JSONB,
+    output_payload      JSONB,
+    error_message       TEXT,
+    started_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at        TIMESTAMPTZ
+);
+CREATE INDEX idx_n8n_exec_status ON n8n_workflow_execution (status);
+CREATE INDEX idx_n8n_exec_trigger ON n8n_workflow_execution (trigger_type, trigger_entity_id);
+
+CREATE TABLE make_webhook_log (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    scenario_name   VARCHAR(255) NOT NULL,           -- 'connect_facebook', 'connect_twitter', etc.
+    event_type      VARCHAR(50) NOT NULL,            -- 'account_connected', 'token_refreshed', 'error'
+    channel_account_id UUID REFERENCES channel_account(id),
+    payload         JSONB,
+    status          VARCHAR(20) NOT NULL DEFAULT 'received', -- received, processed, failed
+    error_message   TEXT,
+    received_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    processed_at    TIMESTAMPTZ
+);
+CREATE INDEX idx_make_log_channel ON make_webhook_log (channel_account_id);
+CREATE INDEX idx_make_log_received ON make_webhook_log (received_at DESC);
+</pre>
+
+  <!-- ===== ERD ===== -->
+  <h3 id="schema-erd">1.10 Entity Relationship Overview</h3>
+
+  <div class="diagram">
+<pre>
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                   ENTITY RELATIONSHIP MAP                                       │
+ ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │                                                                                                  │
+ │  USER ──1:N──► user_social_auth           campaign ──M:N──► target_audience                     │
+ │    │                                          │                                                  │
+ │    ├──M:N──► role ──M:N──► permission         ├──M:N──► website                                 │
+ │    │                                          │                                                  │
+ │    ├──1:N──► refresh_token                    ├──M:N──► channel_account ◄── Make.com OAuth       │
+ │    │                                          │                                                  │
+ │    ├──1:N──► campaign (as owner)              └──1:N──► content                                 │
+ │    │                                                       │                                     │
+ │    ├──1:N──► content (as author)                          ├──1:N──► content_version             │
+ │    │                                                       ├──M:N──► media_asset                │
+ │    ├──1:N──► target_audience (as creator)                  ├──0:1──► ad_config                  │
+ │    │                                                       ├──1:N──► content_review             │
+ │    ├──1:N──► ai_generation_job                             ├──1:N──► publication                │
+ │    │                                                       │            ├──1:N──► publication_log│
+ │    ├──1:N──► notification                                  │            ├──1:N──► analytics_record│
+ │    │                                                       │            └──1:N──► ad_performance │
+ │    └──1:N──► analytics_alert                               ├──1:N──► ai_generation_job          │
+ │                                                            └──1:N──► backlink                   │
+ │                                                                                                  │
+ │  INTEGRATION:                                                                                    │
+ │    n8n_workflow_execution ──tracks──► publication, ai_generation_job                             │
+ │    make_webhook_log       ──logs───► channel_account connection events                          │
+ │                                                                                                  │
+ └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+  </div>
+
+  <!-- ===== MIGRATION STRATEGY ===== -->
+  <h3 id="schema-migration">1.11 Migration Strategy</h3>
+
+  <p>Database migrations are managed by <strong>Doctrine Migrations</strong> bundled with Symfony:</p>
+  <ul>
+    <li>Migrations auto-generated from entity diffs via <code>doctrine:migrations:diff</code></li>
+    <li>Version-controlled in <code>migrations/</code> directory alongside application code</li>
+    <li>Applied in order during deployment via <code>doctrine:migrations:migrate</code></li>
+    <li>Audit log partitions created via a monthly cron-triggered migration or a Symfony command</li>
+    <li>Rollback support via <code>down()</code> methods in each migration class</li>
+    <li>Seed data (roles, permissions, system settings) loaded via Doctrine Fixtures</li>
+  </ul>
+
+  <div class="note">
+    <strong>Convention:</strong> All entity properties use camelCase in PHP. Doctrine maps them to snake_case columns automatically via the naming strategy. UUID generation is handled by Symfony's Uid component (<code>Uuid::v7()</code> for time-ordered IDs).
+  </div>
+</section>
+
+<hr>
+
+<!-- ==================== SECTION 2: ARCHITECTURE ====================== -->
+<section class="section" id="architecture">
+  <h2 class="section-title">2. Software Architecture</h2>
+
+  <h3 id="arch-overview">2.1 System Overview</h3>
+
+  <p>The system follows a decoupled architecture with a <strong>Symfony 7 REST API backend</strong>, a <strong>Next.js 15 frontend</strong>, and an <strong>n8n + Make.com integration layer</strong> for external service communication. The Symfony backend never directly calls social media or AI provider APIs &mdash; all external platform interactions are delegated to n8n workflows.</p>
+
+  <div class="diagram">
+<pre>
+                              ┌─────────────────────┐
+                              │   Nginx Reverse     │
+                              │   Proxy (:80/:443)  │
+                              └─────────┬───────────┘
+                                        │
+                        ┌───────────────┼───────────────┐
+                        │                               │
+               ┌────────▼────────┐            ┌────────▼─────────┐
+               │   Next.js App   │            │   Symfony API     │
+               │  (SSR + Client) │            │  (API Platform)   │
+               │     :3000       │            │     :9000         │
+               └────────┬────────┘            └──┬────┬───┬──────┘
+                        │                        │    │   │
+                        └────── REST API ────────┘    │   │
+                              (JSON + JWT)            │   │
+                                                      │   │
+                    ┌─────────────────────────────────┘   │
+                    │                                      │
+           ┌───────▼───────┐   ┌──────────┐   ┌──────────▼────────┐
+           │  PostgreSQL   │   │  Redis    │   │  n8n              │
+           │  :5432        │   │  :6379    │   │  :5678 (webhooks) │
+           └───────────────┘   └──────────┘   └──────────┬────────┘
+                                                         │
+                                          ┌──────────────┼──────────────┐
+                                          │              │              │
+                                    ┌─────▼────┐  ┌─────▼────┐  ┌─────▼─────┐
+                                    │ Social   │  │ AI       │  │ Make.com  │
+                                    │ Media    │  │ Providers│  │ (OAuth    │
+                                    │ APIs     │  │ (OpenAI, │  │  Flows)   │
+                                    │          │  │  etc.)   │  │           │
+                                    └──────────┘  └──────────┘  └───────────┘
+</pre>
+  </div>
+
+  <div class="note note-accent">
+    <strong>Key Principle:</strong> The Symfony backend is the single source of truth for data. n8n is the execution engine for external interactions. Make.com handles OAuth token negotiation for social media accounts.
+  </div>
+
+  <!-- ===== BACKEND ===== -->
+  <h3 id="arch-backend">2.2 Backend (Symfony 7)</h3>
+
+  <h4>Layered Architecture</h4>
+  <p>The backend follows a layered/hexagonal architecture pattern, ensuring separation of concerns and testability:</p>
+
+  <div class="diagram">
+<pre>
+  HTTP Request
+       │
+       ▼
+  ┌─────────────────────────────┐
+  │  API Platform Resource      │  ← ApiResource DTOs, filters, pagination
+  │  (State Provider/Processor) │  ← Input validation, transformation
+  └──────────┬──────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────┐
+  │  Service Layer              │  ← Business logic, orchestration
+  │  (CampaignService,         │
+  │   ContentService,           │
+  │   PublicationService, etc.) │
+  └──────────┬──────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────┐
+  │  Repository Layer           │  ← Doctrine repositories, query builders
+  └──────────┬──────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────┐
+  │  Entity Layer               │  ← Doctrine ORM entities, lifecycle callbacks
+  └─────────────────────────────┘
+</pre>
+  </div>
+
+  <h4>Directory Structure</h4>
+<pre>
+src/
+├── Controller/          # Webhook controllers (n8n callbacks, Make.com callbacks)
+├── DataFixtures/        # Seed data (roles, permissions, settings)
+├── Dto/                 # API Platform input/output DTOs
+├── Entity/              # Doctrine entities (mapped to DB tables)
+├── EventListener/       # Doctrine lifecycle listeners (audit logging)
+├── EventSubscriber/     # Symfony event subscribers
+├── Message/             # Messenger messages (async commands)
+├── MessageHandler/      # Messenger handlers
+├── Repository/          # Doctrine repositories
+├── Security/            # Voters, JWT authenticator, social login handler
+├── Service/             # Business logic services
+│   ├── Campaign/
+│   ├── Content/
+│   ├── Publication/     # Dispatches to n8n via webhook
+│   ├── AiGeneration/    # Dispatches to n8n via webhook
+│   ├── Analytics/
+│   ├── Integration/     # n8n and Make.com communication
+│   └── Media/           # Flysystem file management
+├── State/               # API Platform state providers & processors
+└── Validator/           # Custom validation constraints
+</pre>
+
+  <h4>Key Components</h4>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Responsibility</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>REST API</td><td>API Platform 4</td><td>Auto-generated CRUD endpoints, OpenAPI docs, pagination, filtering</td></tr>
+      <tr><td>Authentication</td><td>LexikJWT + KnpUOAuth2</td><td>JWT access/refresh tokens + Social OAuth2 login</td></tr>
+      <tr><td>Authorization</td><td>Symfony Voters</td><td>RBAC enforcement on every API resource operation</td></tr>
+      <tr><td>Async Processing</td><td>Symfony Messenger (Redis)</td><td>Notifications, analytics aggregation, scheduled tasks</td></tr>
+      <tr><td>File Storage</td><td>Flysystem 3</td><td>Media uploads abstracted over local/S3 storage</td></tr>
+      <tr><td>Audit Trail</td><td>Doctrine Listeners</td><td>Automatic audit log entries on entity changes</td></tr>
+      <tr><td>Encryption</td><td>libsodium (sodium_crypto_secretbox)</td><td>API tokens and credentials encrypted at rest</td></tr>
+      <tr><td>Webhook Endpoints</td><td>Symfony Controllers</td><td>Receive callbacks from n8n and Make.com</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ===== FRONTEND ===== -->
+  <h3 id="arch-frontend">2.3 Frontend (Next.js 15)</h3>
+
+  <h4>App Router Architecture</h4>
+<pre>
+app/
+├── (auth)/                # Auth group (login, register, social callbacks)
+│   ├── login/
+│   ├── register/
+│   └── callback/[provider]/
+├── (dashboard)/           # Authenticated layout group
+│   ├── layout.tsx         # Sidebar + header layout
+│   ├── page.tsx           # Dashboard home
+│   ├── campaigns/
+│   │   ├── page.tsx       # Campaign list
+│   │   ├── new/           # Campaign creation wizard
+│   │   └── [id]/          # Campaign detail, edit
+│   ├── content/
+│   │   ├── page.tsx       # Content list
+│   │   ├── articles/
+│   │   ├── posts/
+│   │   └── ads/
+│   ├── ai-studio/         # AI content generation
+│   ├── publications/      # Publication management
+│   ├── analytics/
+│   │   ├── page.tsx       # Analytics dashboard
+│   │   ├── campaigns/
+│   │   ├── backlinks/
+│   │   └── ads/
+│   ├── accounts/          # Channel account management (Make.com integration)
+│   └── settings/          # User settings, team management
+├── api/                   # Next.js API routes (BFF proxy if needed)
+└── components/
+    ├── ui/                # shadcn/ui components
+    ├── editors/           # TipTap article editor, post editor, ad builder
+    ├── charts/            # Recharts visualizations
+    └── shared/            # Layout, navigation, shared components
+</pre>
+
+  <h4>State Management</h4>
+  <table>
+    <thead>
+      <tr><th>Concern</th><th>Solution</th><th>Usage</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Server State</td><td>TanStack Query 5</td><td>API data fetching, caching, mutations, optimistic updates</td></tr>
+      <tr><td>Client State</td><td>Zustand</td><td>Editor state, UI preferences, draft content</td></tr>
+      <tr><td>Form State</td><td>React Hook Form + Zod</td><td>Form validation, submission, error handling</td></tr>
+      <tr><td>Auth State</td><td>Next.js Middleware + JWT</td><td>Route protection, token refresh, role checks</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Key UI Features</h4>
+  <ul>
+    <li><strong>Rich-text editor:</strong> TipTap with custom extensions for articles (headings, images, embeds, SEO fields)</li>
+    <li><strong>Post editor:</strong> Platform-specific character counters, media preview, hashtag management</li>
+    <li><strong>Ad builder:</strong> Format selector (carousel, single image, video, story), budget/bid inputs, A/B variant management</li>
+    <li><strong>AI Studio:</strong> Prompt input, provider selection, real-time generation status, result preview and apply-to-content</li>
+    <li><strong>Analytics dashboards:</strong> Recharts time-series, per-channel breakdowns, comparative campaign views, export to CSV/PDF</li>
+    <li><strong>Account connector:</strong> "Connect [Platform]" buttons that redirect to Make.com OAuth scenarios</li>
+    <li><strong>Social login:</strong> Facebook, Google, Microsoft, and Twitter/X login buttons on auth pages</li>
+  </ul>
+
+  <!-- ===== N8N ===== -->
+  <h3 id="arch-n8n">2.4 n8n Integration Layer (Self-Hosted)</h3>
+
+  <p>n8n runs as a Docker container alongside the application stack. It serves as the execution engine for all external platform interactions, triggered via webhook calls from the Symfony backend.</p>
+
+  <h4>Workflow Categories</h4>
+  <table>
+    <thead>
+      <tr><th>Category</th><th>Workflows</th><th>Trigger</th><th>Output</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Publishing</td>
+        <td>publish_facebook, publish_twitter, publish_instagram, publish_whatsapp, publish_website</td>
+        <td>Webhook from Symfony (POST with content + credentials)</td>
+        <td>Callback to Symfony API with status + external post ID</td>
+      </tr>
+      <tr>
+        <td>AI Generation</td>
+        <td>generate_text, generate_image, generate_video</td>
+        <td>Webhook from Symfony (POST with prompt + parameters)</td>
+        <td>Callback to Symfony API with generated content</td>
+      </tr>
+      <tr>
+        <td>Analytics Collection</td>
+        <td>collect_facebook_metrics, collect_twitter_metrics, collect_instagram_metrics</td>
+        <td>Scheduled (cron) or webhook from Symfony</td>
+        <td>Callback to Symfony API with metrics data</td>
+      </tr>
+      <tr>
+        <td>Retry</td>
+        <td>retry_failed_publication</td>
+        <td>Scheduled (checks for failed publications)</td>
+        <td>Re-triggers publish workflow</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Publish Flow (Example: Facebook)</h4>
+  <div class="diagram">
+<pre>
+  ┌──────────┐     POST /webhook/publish         ┌──────────┐
+  │ Symfony  │ ──────────────────────────────────► │ n8n      │
+  │ Backend  │   {content, credentials,            │ Workflow │
+  │          │    channel_account_id,               │          │
+  │          │    publication_id}                   │          │
+  └────▲─────┘                                     └────┬─────┘
+       │                                                 │
+       │                                    ┌────────────▼────────────┐
+       │                                    │ 1. Validate payload     │
+       │                                    │ 2. Format for FB API    │
+       │                                    │ 3. POST to Graph API    │
+       │                                    │ 4. Parse response       │
+       │                                    └────────────┬────────────┘
+       │                                                 │
+       │    PATCH /api/publications/{id}/status           │
+       │◄────────────────────────────────────────────────┘
+       │   {status: "published",
+       │    external_post_id: "...",
+       │    external_url: "..."}
+</pre>
+  </div>
+
+  <!-- ===== MAKE.COM ===== -->
+  <h3 id="arch-make">2.5 Make.com Integration (Cloud)</h3>
+
+  <p>Make.com handles the complex OAuth2 flows for social media account connections. This avoids implementing platform-specific OAuth logic in the Symfony backend.</p>
+
+  <h4>OAuth Connection Flow</h4>
+  <div class="diagram">
+<pre>
+  ┌──────────┐  Click "Connect Facebook"   ┌──────────┐
+  │ Next.js  │ ──────────────────────────► │ Make.com │
+  │ Frontend │  (redirect to Make.com       │ Scenario │
+  │          │   scenario webhook URL       │          │
+  │          │   with user_id param)        │          │
+  └──────────┘                              └────┬─────┘
+                                                 │
+                                    ┌────────────▼────────────┐
+                                    │ 1. Initiate OAuth flow  │
+                                    │ 2. User authorizes app  │
+                                    │    on Facebook/Twitter   │
+                                    │ 3. Receive tokens        │
+                                    │ 4. Send to Symfony API   │
+                                    └────────────┬────────────┘
+                                                 │
+       ┌──────────┐  POST /api/webhooks/make/account-connected
+       │ Symfony  │ ◄────────────────────────────┘
+       │ Backend  │  {user_id, platform, account_name,
+       │          │   access_token, refresh_token,
+       │          │   account_id, metadata}
+       └────┬─────┘
+            │
+            ▼
+       ┌──────────────────────────────┐
+       │ Encrypt tokens               │
+       │ Create/update channel_account │
+       │ Log in make_webhook_log       │
+       │ Notify user via WebSocket     │
+       └──────────────────────────────┘
+</pre>
+  </div>
+
+  <div class="note">
+    <strong>Token Refresh:</strong> Make.com also handles automatic token refresh. When a token nears expiration, a scheduled Make.com scenario refreshes it and sends updated credentials to the Symfony webhook.
+  </div>
+
+  <!-- ===== INFRASTRUCTURE ===== -->
+  <h3 id="arch-infra">2.6 Infrastructure (Docker Compose)</h3>
+
+  <h4>Container Services</h4>
+  <table>
+    <thead>
+      <tr><th>Service</th><th>Image</th><th>Port</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>nginx</td><td>nginx:1.27-alpine</td><td>80, 443</td><td>Reverse proxy, SSL termination, static assets</td></tr>
+      <tr><td>php-fpm</td><td>Custom (PHP 8.3-fpm)</td><td>9000 (internal)</td><td>Symfony application server</td></tr>
+      <tr><td>next-app</td><td>Custom (Node 20-alpine)</td><td>3000 (internal)</td><td>Next.js SSR server</td></tr>
+      <tr><td>postgres</td><td>postgres:16-alpine</td><td>5432</td><td>Primary database</td></tr>
+      <tr><td>redis</td><td>redis:7-alpine</td><td>6379</td><td>Cache, session, Messenger transport</td></tr>
+      <tr><td>n8n</td><td>n8nio/n8n:latest</td><td>5678</td><td>Workflow automation engine</td></tr>
+      <tr><td>messenger-worker</td><td>Same as php-fpm</td><td>&mdash;</td><td>Symfony Messenger consumer process</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Docker Compose Architecture</h4>
+<pre>
+# docker-compose.yml (simplified)
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./backend/public:/var/www/backend/public:ro
+    depends_on: [php-fpm, next-app]
+
+  php-fpm:
+    build: ./docker/php
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      DATABASE_URL: postgresql://app:secret@postgres:5432/marketing_db
+      REDIS_URL: redis://redis:6379
+      N8N_WEBHOOK_BASE_URL: http://n8n:5678/webhook
+      MAKE_WEBHOOK_SECRET: ${MAKE_WEBHOOK_SECRET}
+      JWT_SECRET_KEY: /var/www/backend/config/jwt/private.pem
+      JWT_PUBLIC_KEY: /var/www/backend/config/jwt/public.pem
+    depends_on: [postgres, redis]
+
+  messenger-worker:
+    build: ./docker/php
+    command: php bin/console messenger:consume async --time-limit=3600
+    volumes:
+      - ./backend:/var/www/backend
+    depends_on: [php-fpm, redis]
+    restart: unless-stopped
+
+  next-app:
+    build: ./docker/next
+    volumes:
+      - ./frontend:/app
+    environment:
+      NEXT_PUBLIC_API_URL: /api
+      NEXT_PUBLIC_MAKE_FACEBOOK_URL: ${MAKE_FACEBOOK_SCENARIO_URL}
+      NEXT_PUBLIC_MAKE_TWITTER_URL: ${MAKE_TWITTER_SCENARIO_URL}
+      NEXT_PUBLIC_MAKE_INSTAGRAM_URL: ${MAKE_INSTAGRAM_SCENARIO_URL}
+      NEXT_PUBLIC_MAKE_WHATSAPP_URL: ${MAKE_WHATSAPP_SCENARIO_URL}
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: marketing_db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports: ["5678:5678"]
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_AUTH_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_AUTH_PASSWORD}
+      WEBHOOK_URL: https://${DOMAIN}/n8n/
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+    depends_on: [postgres]
+
+volumes:
+  pg_data:
+  redis_data:
+  n8n_data:
+</pre>
+
+  <h4>Nginx Routing</h4>
+<pre>
+# /etc/nginx/conf.d/default.conf (simplified)
+
+upstream php_upstream    { server php-fpm:9000; }
+upstream next_upstream   { server next-app:3000; }
+upstream n8n_upstream    { server n8n:5678; }
+
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    # Symfony API
+    location /api/ {
+        fastcgi_pass php_upstream;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
+    }
+
+    # n8n webhooks (used by Symfony → n8n)
+    location /n8n/ {
+        proxy_pass http://n8n_upstream/;
+        proxy_set_header Host $host;
+    }
+
+    # Webhook endpoints (n8n → Symfony, Make.com → Symfony)
+    location /api/webhooks/ {
+        fastcgi_pass php_upstream;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
+    }
+
+    # Media uploads
+    location /uploads/ {
+        alias /var/www/backend/public/uploads/;
+        expires 30d;
+    }
+
+    # Next.js frontend (catch-all)
+    location / {
+        proxy_pass http://next_upstream;
+        proxy_set_header Host $host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+</pre>
+
+  <!-- ===== AUTH ===== -->
+  <h3 id="arch-auth">2.7 Authentication &amp; Authorization</h3>
+
+  <h4>Authentication Flow</h4>
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Flow</th><th>Token</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Email + Password</td>
+        <td>POST <code>/api/login</code> → validate credentials → issue JWT</td>
+        <td>Access (15min) + Refresh (7 days)</td>
+      </tr>
+      <tr>
+        <td>Social Login (Facebook, Google, Microsoft, Twitter/X)</td>
+        <td>Frontend redirects to provider → callback to <code>/api/auth/{provider}/callback</code> → KnpUOAuth2 handles exchange → find/create user (match by email) → issue JWT</td>
+        <td>Access (15min) + Refresh (7 days)</td>
+      </tr>
+      <tr>
+        <td>Token Refresh</td>
+        <td>POST <code>/api/token/refresh</code> with refresh token → validate → issue new pair</td>
+        <td>New Access + Refresh</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>RBAC Model</h4>
+  <table>
+    <thead>
+      <tr><th>Role</th><th>Permissions</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>admin</code></td><td>All permissions — full system access</td></tr>
+      <tr><td><code>manager</code></td><td>campaign.*, content.*, publication.*, analytics.view, user.view, account.manage</td></tr>
+      <tr><td><code>editor</code></td><td>content.create, content.edit, content.view, content.submit_review, media.upload</td></tr>
+      <tr><td><code>viewer</code></td><td>campaign.view, content.view, analytics.view, publication.view</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Symfony Voters:</strong> Each resource operation is guarded by a dedicated Voter class that checks the authenticated user's roles and permissions. Resource-level ownership checks are also enforced (e.g., editors can only edit content they authored, unless they have manager role).
+  </div>
+
+  <h4>Webhook Security</h4>
+  <ul>
+    <li><strong>n8n → Symfony:</strong> Callbacks authenticated via a shared secret (<code>X-Webhook-Secret</code> header), validated in a Symfony event subscriber</li>
+    <li><strong>Make.com → Symfony:</strong> Webhooks authenticated via HMAC signature (<code>X-Make-Signature</code> header) using a shared secret</li>
+    <li><strong>Symfony → n8n:</strong> n8n webhook URLs include a unique token path; additionally, n8n basic auth credentials are passed</li>
+  </ul>
+
+  <!-- ===== FLOWS ===== -->
+  <h3 id="arch-flows">2.8 Integration Flows</h3>
+
+  <h4>Flow 1: Content Publication (End-to-End)</h4>
+  <div class="diagram">
+<pre>
+  User clicks "Publish"
+       │
+       ▼
+  [Next.js] POST /api/publications
+       │
+       ▼
+  [Symfony] PublicationService
+       ├── Validate content is approved
+       ├── Create publication record (status: pending)
+       ├── Create publication_log entry (action: created)
+       ├── Retrieve channel_account credentials (decrypt tokens)
+       ├── POST to n8n webhook: /webhook/publish_{platform}
+       │       {publication_id, content, credentials, channel_config}
+       ├── Create n8n_workflow_execution record (status: running)
+       └── Return publication ID to frontend
+                                        │
+                              ┌─────────▼──────────┐
+                              │ [n8n Workflow]      │
+                              │ 1. Parse payload    │
+                              │ 2. Format content   │
+                              │    for platform API │
+                              │ 3. Call platform API│
+                              │ 4. Handle response  │
+                              └─────────┬──────────┘
+                                        │
+       ┌────────────────────────────────▼─────┐
+       │ [n8n] PATCH /api/webhooks/n8n/       │
+       │       publication-status              │
+       │ {publication_id, status,              │
+       │  external_post_id, external_url}      │
+       └──────────────────┬───────────────────┘
+                          │
+  [Symfony] WebhookController
+       ├── Validate webhook secret
+       ├── Update publication record
+       ├── Create publication_log entry
+       ├── Update n8n_workflow_execution
+       ├── Dispatch notification to user (Messenger)
+       └── Return 200 OK
+</pre>
+  </div>
+
+  <h4>Flow 2: AI Content Generation (End-to-End)</h4>
+  <div class="diagram">
+<pre>
+  User submits AI prompt in AI Studio
+       │
+       ▼
+  [Next.js] POST /api/ai-generation-jobs
+       │
+       ▼
+  [Symfony] AiGenerationService
+       ├── Create ai_generation_job record (status: pending)
+       ├── POST to n8n webhook: /webhook/generate_{type}
+       │       {job_id, prompt, parameters, provider}
+       ├── Create n8n_workflow_execution record
+       └── Return job ID (frontend polls for status)
+                                        │
+                              ┌─────────▼──────────┐
+                              │ [n8n Workflow]      │
+                              │ 1. Parse prompt     │
+                              │ 2. Call AI provider │
+                              │    (OpenAI, Claude, │
+                              │     Stability AI)   │
+                              │ 3. Process result   │
+                              └─────────┬──────────┘
+                                        │
+  [n8n] PATCH /api/webhooks/n8n/ai-generation-status
+       {job_id, status, result_text/result_url, metadata}
+                          │
+  [Symfony] WebhookController
+       ├── Update ai_generation_job
+       ├── If linked to content: optionally update content draft
+       ├── Dispatch notification
+       └── Return 200 OK
+                          │
+  [Next.js] (polling) GET /api/ai-generation-jobs/{id}
+       └── Display generated content to user
+</pre>
+  </div>
+
+  <h4>Flow 3: Social Account Connection (End-to-End)</h4>
+  <div class="diagram">
+<pre>
+  User clicks "Connect Facebook" in Accounts page
+       │
+       ▼
+  [Next.js] window.open(MAKE_FACEBOOK_SCENARIO_URL + "?user_id=xxx&amp;callback=...")
+       │
+       ▼
+  [Make.com Scenario]
+       ├── Receive webhook trigger with user_id
+       ├── Redirect user to Facebook OAuth consent screen
+       ├── User authorizes the application
+       ├── Facebook returns auth code to Make.com
+       ├── Make.com exchanges code for tokens
+       ├── Make.com retrieves account/page info
+       └── POST to Symfony: /api/webhooks/make/account-connected
+              {user_id, platform: "facebook", account_name,
+               account_id, access_token, refresh_token, metadata}
+                          │
+  [Symfony] MakeWebhookController
+       ├── Validate HMAC signature
+       ├── Encrypt tokens (libsodium)
+       ├── Create/update channel_account record
+       ├── Log in make_webhook_log
+       ├── Dispatch notification to user
+       └── Return 200 OK
+                          │
+  [Next.js] (polling or WebSocket) → Account connected notification
+       └── Update accounts list in UI
+</pre>
+  </div>
+
+  <!-- ===== NFR MAPPING ===== -->
+  <h3 id="arch-nfr">2.9 Non-Functional Requirements Mapping</h3>
+
+  <table>
+    <thead>
+      <tr><th>Requirement</th><th>Solution</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>NFR-001:</strong> 50 concurrent users</td>
+        <td>Nginx load balancing, PHP-FPM pool with 20+ workers, Redis caching for hot data, Next.js Server Components reduce client load. PostgreSQL connection pooling via PgBouncer if needed.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-002:</strong> 30s publish time</td>
+        <td>Async via n8n webhooks. Symfony returns immediately after dispatching; n8n handles API call. Average publish &lt; 10s for most platforms.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-003:</strong> Credential encryption</td>
+        <td>libsodium <code>sodium_crypto_secretbox</code> for tokens at rest. TLS 1.3 for all traffic. Webhook secrets for n8n/Make.com callbacks.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-004:</strong> RBAC</td>
+        <td>Symfony Voters enforce role-based permissions on every API Platform operation. 4 default roles (admin, manager, editor, viewer) with granular permissions.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-005:</strong> 99.5% uptime</td>
+        <td>Docker restart policies (<code>unless-stopped</code>), health checks on all containers, Redis persistence (AOF), PostgreSQL WAL archiving, n8n execution retries.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-006:</strong> Responsive UI</td>
+        <td>Tailwind CSS responsive utilities, shadcn/ui mobile-first components, Next.js App Router with streaming SSR.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-007:</strong> Platform API integration</td>
+        <td>n8n workflows handle all platform API calls (Facebook Graph, Twitter API v2, Instagram Graph, WhatsApp Business). Make.com manages OAuth connections.</td>
+      </tr>
+      <tr>
+        <td><strong>NFR-008:</strong> Horizontal scaling</td>
+        <td>Stateless API (JWT, no server sessions). Docker Compose can scale <code>php-fpm</code> and <code>next-app</code> services. n8n supports multiple workers. PostgreSQL read replicas for analytics queries.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr>
+
+<!-- ==================== SECTION 3: TECHNOLOGY STACK ================== -->
+<section class="section" id="tech-stack">
+  <h2 class="section-title">3. Technology Stack</h2>
+
+  <h3 id="stack-backend">3.1 Backend</h3>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Language</td><td>PHP</td><td>8.3+</td><td>Backend application language</td></tr>
+      <tr><td>Framework</td><td>Symfony</td><td>7.2+</td><td>Full-stack framework (DI, routing, security, console)</td></tr>
+      <tr><td>API</td><td>API Platform</td><td>4.x</td><td>REST API with auto-generated OpenAPI docs</td></tr>
+      <tr><td>ORM</td><td>Doctrine ORM</td><td>3.x</td><td>Database abstraction, entity mapping, migrations</td></tr>
+      <tr><td>Auth (JWT)</td><td>LexikJWTAuthenticationBundle</td><td>3.x</td><td>JWT access and refresh token management</td></tr>
+      <tr><td>Auth (Social)</td><td>KnpUOAuth2ClientBundle</td><td>6.x</td><td>Social login (Facebook, Google, Microsoft, Twitter/X)</td></tr>
+      <tr><td>OAuth Client</td><td>league/oauth2-client</td><td>2.x</td><td>OAuth2 client for social providers</td></tr>
+      <tr><td>Async Queue</td><td>Symfony Messenger</td><td>bundled</td><td>Async notifications, analytics aggregation</td></tr>
+      <tr><td>Queue Transport</td><td>Redis (via Messenger)</td><td>&mdash;</td><td>Message transport for Symfony Messenger</td></tr>
+      <tr><td>File Storage</td><td>Flysystem</td><td>3.x</td><td>Abstract file storage (local, S3)</td></tr>
+      <tr><td>Encryption</td><td>libsodium (ext-sodium)</td><td>bundled</td><td>Credential encryption at rest</td></tr>
+      <tr><td>HTTP Client</td><td>Symfony HttpClient</td><td>bundled</td><td>Outbound HTTP requests to n8n webhooks</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="stack-frontend">3.2 Frontend</h3>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Framework</td><td>Next.js</td><td>15.x</td><td>React framework with SSR, App Router</td></tr>
+      <tr><td>UI Library</td><td>React</td><td>19.x</td><td>Component-based UI</td></tr>
+      <tr><td>Server State</td><td>TanStack Query</td><td>5.x</td><td>API data fetching, caching, mutations</td></tr>
+      <tr><td>Client State</td><td>Zustand</td><td>5.x</td><td>Lightweight client-side state management</td></tr>
+      <tr><td>Forms</td><td>React Hook Form + Zod</td><td>7.x / 3.x</td><td>Form handling, schema-based validation</td></tr>
+      <tr><td>Rich Text Editor</td><td>TipTap</td><td>2.x</td><td>Article editor with rich formatting</td></tr>
+      <tr><td>Charts</td><td>Recharts</td><td>2.x</td><td>Analytics visualizations</td></tr>
+      <tr><td>CSS Framework</td><td>Tailwind CSS</td><td>4.x</td><td>Utility-first CSS</td></tr>
+      <tr><td>UI Components</td><td>shadcn/ui</td><td>latest</td><td>Pre-built accessible components</td></tr>
+      <tr><td>Language</td><td>TypeScript</td><td>5.x</td><td>Type-safe JavaScript</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="stack-infra">3.3 Infrastructure</h3>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Database</td><td>PostgreSQL</td><td>16</td><td>Primary relational database</td></tr>
+      <tr><td>Cache / Queue</td><td>Redis</td><td>7.x</td><td>Caching, Messenger transport, sessions</td></tr>
+      <tr><td>Web Server</td><td>Nginx</td><td>1.27</td><td>Reverse proxy, SSL termination</td></tr>
+      <tr><td>Automation</td><td>n8n (self-hosted)</td><td>latest</td><td>Publishing, AI generation, analytics workflows</td></tr>
+      <tr><td>Integration</td><td>Make.com (cloud)</td><td>SaaS</td><td>Social media OAuth account connections</td></tr>
+      <tr><td>Containers</td><td>Docker + Docker Compose</td><td>latest</td><td>Container orchestration, local dev &amp; production</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="stack-testing">3.4 Testing &amp; Quality</h3>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Backend Tests</td><td>PHPUnit</td><td>11.x</td><td>Unit and integration tests for Symfony</td></tr>
+      <tr><td>Frontend Tests</td><td>Vitest + Testing Library</td><td>latest</td><td>Component and hook tests</td></tr>
+      <tr><td>E2E Tests</td><td>Playwright</td><td>latest</td><td>End-to-end browser testing</td></tr>
+      <tr><td>PHP Code Style</td><td>PHP-CS-Fixer</td><td>latest</td><td>Automated code formatting</td></tr>
+      <tr><td>PHP Static Analysis</td><td>PHPStan (Level 8)</td><td>latest</td><td>Static type checking for PHP</td></tr>
+      <tr><td>JS Linting</td><td>ESLint</td><td>latest</td><td>JavaScript/TypeScript linting</td></tr>
+      <tr><td>JS Formatting</td><td>Prettier</td><td>latest</td><td>Code formatting for frontend</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<hr>
+
+<!-- ==================== SECTION 4: DEVELOPMENT PLAN ================== -->
+<section class="section" id="dev-plan">
+  <h2 class="section-title">4. Development Plan</h2>
+
+  <h3 id="plan-overview">4.1 Phase Overview (~20 Weeks)</h3>
+
+  <table>
+    <thead>
+      <tr><th>Phase</th><th>Weeks</th><th>Focus</th><th>Dependencies</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Phase 1</strong></td><td>1–3</td><td>Foundation + Authentication + RBAC</td><td>&mdash;</td></tr>
+      <tr><td><strong>Phase 2</strong></td><td>4–5</td><td>Campaign Management</td><td>Phase 1</td></tr>
+      <tr><td><strong>Phase 3</strong></td><td>6–9</td><td>Content Management (CMS)</td><td>Phase 2</td></tr>
+      <tr><td><strong>Phase 4</strong></td><td>10–11</td><td>AI Content Generation</td><td>Phases 1 + 3</td></tr>
+      <tr><td><strong>Phase 5</strong></td><td>12–14</td><td>Publication</td><td>Phases 2 + 3 + 4</td></tr>
+      <tr><td><strong>Phase 6</strong></td><td>15–17</td><td>Analytics</td><td>Phase 5</td></tr>
+      <tr><td><strong>Phase 7</strong></td><td>18–20</td><td>Hardening &amp; Deployment</td><td>All</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="plan-phases">4.2 Detailed Phases</h3>
+
+  <!-- PHASE 1 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 1: Foundation + Authentication + RBAC</span>
+      <span class="weeks">Weeks 1–3</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>Docker Compose environment setup (Nginx, PHP-FPM, PostgreSQL, Redis, n8n)</li>
+        <li>Symfony 7 project initialization with API Platform 4</li>
+        <li>Database schema creation — Core/RBAC tables (user, role, permission, user_role, role_permission, refresh_token, user_social_auth)</li>
+        <li>Doctrine Migrations initial setup and seed fixtures (roles, permissions)</li>
+        <li>JWT authentication (LexikJWT): login, register, token refresh endpoints</li>
+        <li>Social login integration (KnpUOAuth2ClientBundle): Facebook, Google, Microsoft, Twitter/X</li>
+        <li>Account auto-linking by email (social + email/password)</li>
+        <li>RBAC implementation with Symfony Voters</li>
+        <li>Audit logging via Doctrine lifecycle listeners</li>
+        <li>System settings and notification entities</li>
+        <li>CI/CD pipeline setup (PHPUnit, PHP-CS-Fixer, PHPStan)</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>Next.js 15 project initialization with App Router</li>
+        <li>Tailwind CSS + shadcn/ui setup</li>
+        <li>Login page (email/password form + social login buttons)</li>
+        <li>Registration page (email/password form + social login buttons)</li>
+        <li>Social login callback handling</li>
+        <li>JWT middleware for route protection</li>
+        <li>Dashboard layout (sidebar, header, user menu)</li>
+        <li>Basic settings page (profile, password change)</li>
+        <li>Frontend CI (ESLint, Prettier, Vitest)</li>
+      </ul>
+      <div class="deps"><strong>Deliverables:</strong> Working auth system with social login, RBAC, audit trail, Docker dev environment, CI/CD pipeline.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 2: Campaign Management</span>
+      <span class="weeks">Weeks 4–5</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>Campaign CRUD API (create, read, update, delete, list with filters/pagination)</li>
+        <li>Target audience management API (CRUD + reuse across campaigns)</li>
+        <li>Website management API (CRUD, API key encryption)</li>
+        <li>Channel account entity and API (linked to Make.com OAuth flow)</li>
+        <li>Campaign-channel and campaign-website association APIs</li>
+        <li>Campaign validation rules (at least one channel or website required)</li>
+        <li>Campaign status workflow (draft → active → paused → completed → archived)</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>Campaign list page with filters and search</li>
+        <li>Campaign creation wizard (multi-step form: info → audience → channels → websites → summary)</li>
+        <li>Target audience management (create, select existing, edit)</li>
+        <li>Channel accounts page with "Connect [Platform]" buttons (Make.com redirect)</li>
+        <li>Website management UI</li>
+        <li>Campaign detail view and edit</li>
+      </ul>
+      <h4>Integration</h4>
+      <ul>
+        <li>Make.com OAuth scenarios for Facebook, Twitter/X, Instagram, WhatsApp</li>
+        <li>Symfony webhook endpoint for Make.com account-connected callback</li>
+        <li>Make webhook log tracking</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> Phase 1 (auth, RBAC). <strong>Deliverables:</strong> Full campaign CRUD, social account connection via Make.com.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 3: Content Management (CMS)</span>
+      <span class="weeks">Weeks 6–9</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>Content CRUD API (articles, posts, ads) with type-specific validation</li>
+        <li>Content versioning system (content_version table, version increment on edit)</li>
+        <li>Media asset upload API (Flysystem: local + S3 support)</li>
+        <li>Content-media association management</li>
+        <li>Ad configuration API (formats, budgets, bid strategies, A/B variants)</li>
+        <li>Content review workflow API (submit → review → approve/reject/request changes)</li>
+        <li>Content duplication endpoint</li>
+        <li>Auto-save support (draft save endpoint with debounce)</li>
+        <li>SEO metadata handling for articles</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>Article editor with TipTap (rich text: headings, bold, italic, links, images, embeds)</li>
+        <li>Article SEO fields panel (title tag, meta description, keywords)</li>
+        <li>Article preview mode</li>
+        <li>Post editor with platform-specific character counters</li>
+        <li>Post media attachment and preview</li>
+        <li>Post scheduling UI</li>
+        <li>Ad builder (format selector, headline, CTA, budget/bid inputs)</li>
+        <li>A/B variant management UI</li>
+        <li>Media gallery/upload component</li>
+        <li>Content version history viewer</li>
+        <li>Content review workflow UI (submit for review, approve/reject with comments)</li>
+        <li>Content list with status filters, search, and campaign grouping</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> Phase 2 (campaigns). <strong>Deliverables:</strong> Full CMS with three content types, versioning, review workflow.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 4: AI Content Generation</span>
+      <span class="weeks">Weeks 10–11</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>AI generation job CRUD API</li>
+        <li>n8n webhook dispatch for AI generation requests</li>
+        <li>Webhook callback endpoint for AI generation results</li>
+        <li>Job status tracking and polling endpoint</li>
+        <li>Integration with content system (apply generated content to draft)</li>
+      </ul>
+      <h4>n8n Workflows</h4>
+      <ul>
+        <li>Text generation workflow (OpenAI GPT / Claude API integration)</li>
+        <li>Image generation workflow (DALL-E / Stability AI integration)</li>
+        <li>Video generation workflow (provider TBD)</li>
+        <li>Error handling and retry logic in workflows</li>
+        <li>Result callback to Symfony API</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>AI Studio page (dedicated AI content generation interface)</li>
+        <li>Prompt input with provider selection</li>
+        <li>Generation status indicator (polling-based)</li>
+        <li>Generated content preview (text, image, video)</li>
+        <li>"Apply to Content" button (insert generated content into content editor)</li>
+        <li>Generation history list</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> Phases 1 + 3 (auth, content). <strong>Deliverables:</strong> AI content generation via n8n, integrated with CMS.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 5: Publication</span>
+      <span class="weeks">Weeks 12–14</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>Publication CRUD API</li>
+        <li>Publication dispatch service (creates publication record, sends to n8n)</li>
+        <li>Webhook callback endpoint for publication status updates</li>
+        <li>Scheduled publication handler (Symfony Messenger scheduled message or cron)</li>
+        <li>Publication retry logic (auto-retry on failure up to max_retries)</li>
+        <li>Unpublish/retract endpoint</li>
+        <li>Publication log tracking</li>
+        <li>n8n workflow execution tracking</li>
+      </ul>
+      <h4>n8n Workflows</h4>
+      <ul>
+        <li>Facebook publish workflow (Graph API: posts, images, videos)</li>
+        <li>Twitter/X publish workflow (API v2: tweets with media)</li>
+        <li>Instagram publish workflow (Graph API: feed posts, stories)</li>
+        <li>WhatsApp publish workflow (Business API: template messages, media)</li>
+        <li>Website publish workflow (CMS API: WordPress REST API, custom API)</li>
+        <li>Retry workflow for failed publications</li>
+        <li>All workflows callback to Symfony with status</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>Publish button on content detail (immediate or scheduled)</li>
+        <li>Channel selection for publication</li>
+        <li>Publication status dashboard (pending, published, failed per channel)</li>
+        <li>Publication log viewer</li>
+        <li>Retry failed publications UI</li>
+        <li>Unpublish/retract action</li>
+        <li>Schedule publication calendar/date picker</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> Phases 2 + 3 + 4 (campaigns, content, AI). <strong>Deliverables:</strong> Multi-channel publication via n8n with scheduling and retry.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 6: Analytics</span>
+      <span class="weeks">Weeks 15–17</span>
+    </div>
+    <div class="phase-body">
+      <h4>Backend</h4>
+      <ul>
+        <li>Analytics record ingestion API (receives metrics from n8n)</li>
+        <li>Ad performance tracking API</li>
+        <li>Backlink tracking API (CRUD, automated discovery via n8n)</li>
+        <li>Analytics aggregation service (Messenger async jobs)</li>
+        <li>Alert system (configurable thresholds, email/in-app notifications)</li>
+        <li>CSV and PDF export endpoints</li>
+        <li>Comparative analytics queries (cross-campaign, cross-channel)</li>
+        <li>ROI calculation service (ad spend vs. backlinks/conversions)</li>
+      </ul>
+      <h4>n8n Workflows</h4>
+      <ul>
+        <li>Facebook metrics collection workflow (scheduled, calls Graph API)</li>
+        <li>Twitter metrics collection workflow (scheduled, calls API v2)</li>
+        <li>Instagram metrics collection workflow (scheduled, calls Graph API)</li>
+        <li>Backlink discovery workflow (calls SEO API or crawls)</li>
+        <li>All workflows send collected data to Symfony API</li>
+      </ul>
+      <h4>Frontend</h4>
+      <ul>
+        <li>Analytics dashboard with overview metrics (Recharts)</li>
+        <li>Time-series engagement charts (views, likes, shares, comments, clicks)</li>
+        <li>Per-channel performance breakdown</li>
+        <li>Campaign comparison view</li>
+        <li>Ad performance dashboard (impressions, CTR, conversions, CPA, ROAS)</li>
+        <li>Backlink analytics page (source/destination, domain authority, status)</li>
+        <li>Binome analysis view (ad spend vs. backlink correlation)</li>
+        <li>Alert configuration UI</li>
+        <li>CSV and PDF export buttons</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> Phase 5 (publication). <strong>Deliverables:</strong> Full analytics suite with dashboards, alerts, and export.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 7 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <span>Phase 7: Hardening &amp; Deployment</span>
+      <span class="weeks">Weeks 18–20</span>
+    </div>
+    <div class="phase-body">
+      <h4>Testing</h4>
+      <ul>
+        <li>Backend: PHPUnit unit tests (services, validators) — target 80%+ coverage</li>
+        <li>Backend: PHPUnit integration tests (API endpoints with test database)</li>
+        <li>Frontend: Vitest component tests (editors, forms, charts)</li>
+        <li>Frontend: Vitest hook tests (TanStack Query hooks, Zustand stores)</li>
+        <li>E2E: Playwright tests for critical flows (auth, campaign creation, content edit, publish, analytics)</li>
+        <li>n8n workflow testing (manual + automated trigger tests)</li>
+      </ul>
+      <h4>Performance</h4>
+      <ul>
+        <li>Database query optimization (EXPLAIN ANALYZE on critical queries)</li>
+        <li>Redis caching strategy (API response caching, query result caching)</li>
+        <li>Next.js optimization (static generation for public pages, image optimization)</li>
+        <li>PHP-FPM tuning (worker count, memory limits)</li>
+        <li>Nginx caching headers for static assets</li>
+        <li>Load testing with 50+ concurrent users</li>
+      </ul>
+      <h4>Security</h4>
+      <ul>
+        <li>Security audit (OWASP Top 10 checklist)</li>
+        <li>Rate limiting on auth and webhook endpoints</li>
+        <li>CORS configuration review</li>
+        <li>CSP headers for frontend</li>
+        <li>Dependency vulnerability scanning (Composer audit, npm audit)</li>
+        <li>SSL/TLS certificate setup (Let's Encrypt)</li>
+      </ul>
+      <h4>Production Deployment</h4>
+      <ul>
+        <li>Production Docker Compose configuration (resource limits, health checks)</li>
+        <li>Environment variable management (secrets, API keys)</li>
+        <li>PostgreSQL backup strategy (pg_dump cron, WAL archiving)</li>
+        <li>Log aggregation setup</li>
+        <li>Monitoring and alerting (container health, API response times)</li>
+        <li>Deployment runbook and documentation</li>
+      </ul>
+      <div class="deps"><strong>Dependencies:</strong> All previous phases. <strong>Deliverables:</strong> Production-ready system with tests, security hardened, deployed.</div>
+    </div>
+  </div>
+
+  <!-- ===== RISKS ===== -->
+  <h3 id="plan-risks">4.3 Risks &amp; Mitigations</h3>
+
+  <table>
+    <thead>
+      <tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Social media API changes or rate limits</td>
+        <td>Publication failures, metric collection gaps</td>
+        <td>n8n workflows are easily updated independently of application code. Rate limit handling built into n8n workflows with backoff. Make.com handles token rotation.</td>
+      </tr>
+      <tr>
+        <td>n8n service downtime</td>
+        <td>Publications and AI generation stall</td>
+        <td>Docker restart policy + health checks. Symfony queues publish requests; n8n processes on recovery. Failed jobs tracked and retried.</td>
+      </tr>
+      <tr>
+        <td>Make.com OAuth flow changes</td>
+        <td>Users cannot connect social accounts</td>
+        <td>Make.com scenarios are independently manageable. Fallback: manual token entry for advanced users.</td>
+      </tr>
+      <tr>
+        <td>AI provider API cost overruns</td>
+        <td>Unexpected expenses</td>
+        <td>Rate limiting on AI generation endpoint. Usage tracking per user. Admin configurable limits in system_setting.</td>
+      </tr>
+      <tr>
+        <td>Scope creep in CMS phase</td>
+        <td>Delayed timeline</td>
+        <td>Strict scope control: implement "Must Have" requirements first. "Should Have" and "Could Have" features in backlog for post-launch iterations.</td>
+      </tr>
+      <tr>
+        <td>Credential security breach</td>
+        <td>Compromised social accounts</td>
+        <td>libsodium encryption at rest. Minimal credential exposure — n8n receives tokens only during publish. Webhook secret rotation.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr>
+
+<!-- ================ REQUIREMENTS COVERAGE ========================== -->
+<section class="section" id="req-coverage">
+  <h2 class="section-title">Appendix: Functional Requirements Coverage</h2>
+
+  <p>All functional requirements from the project definition are addressed by the architecture:</p>
+
+  <table>
+    <thead>
+      <tr><th>Module</th><th>Req IDs</th><th>Architecture Component</th><th>Phase</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Campaign Creation</td><td>FR-CC-001 to FR-CC-008</td><td>Campaign API + Frontend wizard</td><td>2</td></tr>
+      <tr><td>CMS — Articles</td><td>FR-CMS-001 to FR-CMS-005</td><td>Content API + TipTap editor</td><td>3</td></tr>
+      <tr><td>CMS — Posts</td><td>FR-CMS-010 to FR-CMS-014</td><td>Content API + Post editor</td><td>3</td></tr>
+      <tr><td>CMS — Ads</td><td>FR-CMS-020 to FR-CMS-024</td><td>Content API + Ad builder + ad_config table</td><td>3</td></tr>
+      <tr><td>CMS — Workflow</td><td>FR-CMS-030 to FR-CMS-032</td><td>content_version + content_review tables</td><td>3</td></tr>
+      <tr><td>Publication</td><td>FR-PUB-001 to FR-PUB-008</td><td>Publication API + n8n workflows + Make.com</td><td>2 + 5</td></tr>
+      <tr><td>Analytics — Publication</td><td>FR-AN-001 to FR-AN-005</td><td>analytics_record + Recharts dashboards</td><td>6</td></tr>
+      <tr><td>Analytics — Backlinks</td><td>FR-AN-010 to FR-AN-014</td><td>backlink + ad_performance tables + alerts</td><td>6</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div><!-- .content -->
+
+<footer>
+  <p>Digital Marketing Campaign Management System &mdash; Technical Architecture v1.0 &mdash; February 2026</p>
+  <p>Symfony 7 &middot; Next.js 15 &middot; PostgreSQL 16 &middot; n8n &middot; Make.com &middot; Docker</p>
+</footer>
+
+</div><!-- .page-wrapper -->
+</body>
+</html>
