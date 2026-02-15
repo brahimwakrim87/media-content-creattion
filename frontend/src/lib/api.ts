@@ -71,6 +71,8 @@ export async function login(
   const data = await response.json();
   localStorage.setItem("access_token", data.token);
   localStorage.setItem("refresh_token", data.refresh_token);
+  // Set cookie so Next.js middleware can read it server-side
+  document.cookie = `access_token=${data.token}; path=/; max-age=900; SameSite=Lax`;
   return data;
 }
 
@@ -118,6 +120,7 @@ export async function refreshToken(): Promise<boolean> {
 
     const data = await response.json();
     localStorage.setItem("access_token", data.token);
+    document.cookie = `access_token=${data.token}; path=/; max-age=900; SameSite=Lax`;
     if (data.refresh_token) {
       localStorage.setItem("refresh_token", data.refresh_token);
     }
@@ -130,4 +133,5 @@ export async function refreshToken(): Promise<boolean> {
 export function logout(): void {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  document.cookie = "access_token=; path=/; max-age=0";
 }
