@@ -24,6 +24,7 @@ security:
         api:
             pattern: ^/api/
             stateless: true
+            entry_point: jwt
             jwt: ~
             refresh_jwt:
                 check_path: api_token_refresh
