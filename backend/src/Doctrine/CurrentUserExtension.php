@@ -8,6 +8,8 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Entity\Campaign;
 use App\Entity\CampaignObject;
+use App\Entity\CampaignTarget;
+use App\Entity\Publication;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -56,6 +58,19 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
         if ($resourceClass === CampaignObject::class) {
             $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'campaign_owner_filter')
                 ->andWhere('campaign_owner_filter.owner = :current_user')
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === CampaignTarget::class) {
+            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'ct_campaign')
+                ->andWhere('ct_campaign.owner = :current_user')
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === Publication::class) {
+            $queryBuilder->join(sprintf('%s.campaignObject', $rootAlias), 'pub_content')
+                ->join('pub_content.campaign', 'pub_campaign')
+                ->andWhere('pub_campaign.owner = :current_user')
                 ->setParameter('current_user', $user);
         }
     }

@@ -4,8 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\Campaign;
 use App\Entity\CampaignObject;
+use App\Entity\CampaignTarget;
 use App\Entity\Permission;
+use App\Entity\Publication;
 use App\Entity\Role;
+use App\Entity\SocialAccount;
 use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -248,6 +251,86 @@ class AppFixtures extends Fixture
         $obj7->setContent('Promotional banner ad for holiday sale - 20% off all products.');
         $obj7->setStatus('published');
         $manager->persist($obj7);
+
+        // Create social accounts
+        $fbAccount = new SocialAccount();
+        $fbAccount->setPlatform('facebook');
+        $fbAccount->setAccountName('DMCC Official Page');
+        $fbAccount->setAccountType('page');
+        $fbAccount->setAccountIdentifier('dmcc-page-12345');
+        $fbAccount->setStatus('active');
+        $fbAccount->setCreatedBy($admin);
+        $fbAccount->setExpiresAt(new \DateTimeImmutable('+90 days'));
+        $manager->persist($fbAccount);
+
+        $igAccount = new SocialAccount();
+        $igAccount->setPlatform('instagram');
+        $igAccount->setAccountName('dmcc_official');
+        $igAccount->setAccountType('business');
+        $igAccount->setAccountIdentifier('dmcc_ig_67890');
+        $igAccount->setStatus('active');
+        $igAccount->setCreatedBy($admin);
+        $igAccount->setExpiresAt(new \DateTimeImmutable('+90 days'));
+        $manager->persist($igAccount);
+
+        $linkedinAccount = new SocialAccount();
+        $linkedinAccount->setPlatform('linkedin');
+        $linkedinAccount->setAccountName('DMCC Company');
+        $linkedinAccount->setAccountType('page');
+        $linkedinAccount->setAccountIdentifier('dmcc-linkedin-abc123');
+        $linkedinAccount->setStatus('active');
+        $linkedinAccount->setCreatedBy($admin);
+        $linkedinAccount->setExpiresAt(new \DateTimeImmutable('+90 days'));
+        $manager->persist($linkedinAccount);
+
+        // Campaign targets: campaign1 → Facebook + Instagram
+        $ct1 = new CampaignTarget();
+        $ct1->setCampaign($campaign1);
+        $ct1->setSocialAccount($fbAccount);
+        $ct1->setIsActive(true);
+        $manager->persist($ct1);
+
+        $ct2 = new CampaignTarget();
+        $ct2->setCampaign($campaign1);
+        $ct2->setSocialAccount($igAccount);
+        $ct2->setIsActive(true);
+        $manager->persist($ct2);
+
+        // Publications
+        $pub1 = new Publication();
+        $pub1->setCampaignObject($obj1);
+        $pub1->setSocialAccount($fbAccount);
+        $pub1->setPlatform('facebook');
+        $pub1->setStatus('published');
+        $pub1->setScheduledAt(new \DateTimeImmutable('2026-02-01 10:00:00'));
+        $pub1->setPublishedAt(new \DateTimeImmutable('2026-02-01 10:01:23'));
+        $pub1->setExternalId('fb_post_xyz789');
+        $manager->persist($pub1);
+
+        $pub2 = new Publication();
+        $pub2->setCampaignObject($obj2);
+        $pub2->setSocialAccount($igAccount);
+        $pub2->setPlatform('instagram');
+        $pub2->setStatus('scheduled');
+        $pub2->setScheduledAt(new \DateTimeImmutable('2026-02-20 14:00:00'));
+        $manager->persist($pub2);
+
+        $pub3 = new Publication();
+        $pub3->setCampaignObject($obj2);
+        $pub3->setSocialAccount($linkedinAccount);
+        $pub3->setPlatform('linkedin');
+        $pub3->setStatus('draft');
+        $manager->persist($pub3);
+
+        $pub4 = new Publication();
+        $pub4->setCampaignObject($obj3);
+        $pub4->setSocialAccount($fbAccount);
+        $pub4->setPlatform('facebook');
+        $pub4->setStatus('failed');
+        $pub4->setScheduledAt(new \DateTimeImmutable('2026-02-15 12:00:00'));
+        $pub4->setErrorMessage('Image dimensions not supported for this platform');
+        $pub4->setRetryCount(2);
+        $manager->persist($pub4);
 
         $manager->flush();
     }

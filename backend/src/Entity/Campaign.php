@@ -105,6 +105,11 @@ class Campaign
     #[Groups(['campaign:item:read'])]
     private Collection $campaignObjects;
 
+    /** @var Collection<int, CampaignTarget> */
+    #[ORM\OneToMany(targetEntity: CampaignTarget::class, mappedBy: 'campaign', cascade: ['persist', 'remove'])]
+    #[Groups(['campaign:item:read'])]
+    private Collection $campaignTargets;
+
     /** @var Collection<int, Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'campaigns')]
     #[ORM\JoinTable(name: 'campaign_tag')]
@@ -116,6 +121,7 @@ class Campaign
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->campaignObjects = new ArrayCollection();
+        $this->campaignTargets = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
 
@@ -248,6 +254,31 @@ class Campaign
         if ($this->campaignObjects->removeElement($campaignObject)) {
             if ($campaignObject->getCampaign() === $this) {
                 $campaignObject->setCampaign(null);
+            }
+        }
+        return $this;
+    }
+
+    /** @return Collection<int, CampaignTarget> */
+    public function getCampaignTargets(): Collection
+    {
+        return $this->campaignTargets;
+    }
+
+    public function addCampaignTarget(CampaignTarget $campaignTarget): static
+    {
+        if (!$this->campaignTargets->contains($campaignTarget)) {
+            $this->campaignTargets->add($campaignTarget);
+            $campaignTarget->setCampaign($this);
+        }
+        return $this;
+    }
+
+    public function removeCampaignTarget(CampaignTarget $campaignTarget): static
+    {
+        if ($this->campaignTargets->removeElement($campaignTarget)) {
+            if ($campaignTarget->getCampaign() === $this) {
+                $campaignTarget->setCampaign(null);
             }
         }
         return $this;

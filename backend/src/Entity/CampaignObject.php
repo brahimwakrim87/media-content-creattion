@@ -105,6 +105,11 @@ class CampaignObject
     #[Groups(['content:read'])]
     private \DateTimeImmutable $updatedAt;
 
+    /** @var Collection<int, Publication> */
+    #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'campaignObject', cascade: ['persist', 'remove'])]
+    #[Groups(['content:item:read'])]
+    private Collection $publications;
+
     /** @var Collection<int, Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'campaignObjects')]
     #[ORM\JoinTable(name: 'campaign_object_tag')]
@@ -115,6 +120,7 @@ class CampaignObject
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->publications = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
 
@@ -203,6 +209,31 @@ class CampaignObject
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /** @return Collection<int, Publication> */
+    public function getPublications(): Collection
+    {
+        return $this->publications;
+    }
+
+    public function addPublication(Publication $publication): static
+    {
+        if (!$this->publications->contains($publication)) {
+            $this->publications->add($publication);
+            $publication->setCampaignObject($this);
+        }
+        return $this;
+    }
+
+    public function removePublication(Publication $publication): static
+    {
+        if ($this->publications->removeElement($publication)) {
+            if ($publication->getCampaignObject() === $this) {
+                $publication->setCampaignObject(null);
+            }
+        }
+        return $this;
     }
 
     /** @return Collection<int, Tag> */
