@@ -43,9 +43,9 @@ export async function apiFetch<T = unknown>(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({
-      message: "An unexpected error occurred",
+      detail: "An unexpected error occurred",
     }));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    throw new Error(error.detail || error.message || `HTTP error ${response.status}`);
   }
 
   return response.json();
@@ -54,8 +54,8 @@ export async function apiFetch<T = unknown>(
 export async function login(
   email: string,
   password: string
-): Promise<{ access_token: string; refresh_token: string }> {
-  const response = await fetch(`${BASE_URL}/api/login`, {
+): Promise<{ token: string; refresh_token: string }> {
+  const response = await fetch(`${BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -63,13 +63,13 @@ export async function login(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({
-      message: "Login failed",
+      detail: "Login failed",
     }));
-    throw new Error(error.message || "Login failed");
+    throw new Error(error.detail || error.message || "Login failed");
   }
 
   const data = await response.json();
-  localStorage.setItem("access_token", data.access_token);
+  localStorage.setItem("access_token", data.token);
   localStorage.setItem("refresh_token", data.refresh_token);
   return data;
 }
@@ -79,29 +79,28 @@ export async function register(
   password: string,
   firstName: string,
   lastName: string
-): Promise<{ access_token: string; refresh_token: string }> {
-  const response = await fetch(`${BASE_URL}/api/register`, {
+): Promise<{ token: string; refresh_token: string }> {
+  // Register the user
+  const regResponse = await fetch(`${BASE_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       email,
       password,
-      first_name: firstName,
-      last_name: lastName,
+      firstName,
+      lastName,
     }),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: "Registration failed",
+  if (!regResponse.ok) {
+    const error = await regResponse.json().catch(() => ({
+      detail: "Registration failed",
     }));
-    throw new Error(error.message || "Registration failed");
+    throw new Error(error.detail || error.message || "Registration failed");
   }
 
-  const data = await response.json();
-  localStorage.setItem("access_token", data.access_token);
-  localStorage.setItem("refresh_token", data.refresh_token);
-  return data;
+  // Auto-login after successful registration
+  return login(email, password);
 }
 
 export async function refreshToken(): Promise<boolean> {
@@ -109,7 +108,7 @@ export async function refreshToken(): Promise<boolean> {
   if (!token) return false;
 
   try {
-    const response = await fetch(`${BASE_URL}/api/token/refresh`, {
+    const response = await fetch(`${BASE_URL}/token/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh_token: token }),
@@ -118,7 +117,7 @@ export async function refreshToken(): Promise<boolean> {
     if (!response.ok) return false;
 
     const data = await response.json();
-    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("access_token", data.token);
     if (data.refresh_token) {
       localStorage.setItem("refresh_token", data.refresh_token);
     }

@@ -67,9 +67,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (payload) {
           const user: User = {
             id: (payload.sub as string) || (payload.id as string) || "",
-            email: (payload.email as string) || email,
-            firstName: (payload.first_name as string) || "",
-            lastName: (payload.last_name as string) || "",
+            email: (payload.username as string) || (payload.email as string) || email,
+            firstName: "",
+            lastName: "",
             roles: (payload.roles as string[]) || [],
           };
           set({ user, isAuthenticated: true, isLoading: false });
@@ -98,9 +98,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (payload) {
           const user: User = {
             id: (payload.sub as string) || (payload.id as string) || "",
-            email: (payload.email as string) || email,
-            firstName: (payload.first_name as string) || firstName,
-            lastName: (payload.last_name as string) || lastName,
+            email: (payload.username as string) || (payload.email as string) || email,
+            firstName: firstName,
+            lastName: lastName,
             roles: (payload.roles as string[]) || [],
           };
           set({ user, isAuthenticated: true, isLoading: false });
@@ -145,9 +145,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const user: User = {
       id: (payload.sub as string) || (payload.id as string) || "",
-      email: (payload.email as string) || "",
-      firstName: (payload.first_name as string) || "",
-      lastName: (payload.last_name as string) || "",
+      email: (payload.username as string) || (payload.email as string) || "",
+      firstName: "",
+      lastName: "",
       roles: (payload.roles as string[]) || [],
     };
     set({ user, isAuthenticated: true, isLoading: false });
