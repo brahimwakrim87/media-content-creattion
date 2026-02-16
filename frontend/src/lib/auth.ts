@@ -3,6 +3,7 @@ import {
   login as apiLogin,
   register as apiRegister,
   logout as apiLogout,
+  apiFetch,
 } from "@/lib/api";
 
 interface User {
@@ -10,6 +11,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  avatarUrl: string | null;
   roles: string[];
 }
 
@@ -27,6 +29,7 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   checkAuth: () => void;
+  fetchProfile: () => Promise<void>;
 }
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
@@ -45,7 +48,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -56,6 +59,31 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: !!user,
       isLoading: false,
     }),
+
+  fetchProfile: async () => {
+    try {
+      const profile = await apiFetch<{
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        avatarUrl: string | null;
+        roles: string[];
+      }>("/me");
+      set({
+        user: {
+          id: profile.id,
+          email: profile.email,
+          firstName: profile.firstName || "",
+          lastName: profile.lastName || "",
+          avatarUrl: profile.avatarUrl,
+          roles: profile.roles || [],
+        },
+      });
+    } catch {
+      // Profile fetch failed — keep JWT-decoded user data
+    }
+  },
 
   login: async (email: string, password: string) => {
     set({ isLoading: true });
@@ -70,9 +98,12 @@ export const useAuthStore = create<AuthState>((set) => ({
             email: (payload.username as string) || (payload.email as string) || email,
             firstName: "",
             lastName: "",
+            avatarUrl: null,
             roles: (payload.roles as string[]) || [],
           };
           set({ user, isAuthenticated: true, isLoading: false });
+          // Fetch full profile in background
+          get().fetchProfile();
           return;
         }
       }
@@ -101,6 +132,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             email: (payload.username as string) || (payload.email as string) || email,
             firstName: firstName,
             lastName: lastName,
+            avatarUrl: null,
             roles: (payload.roles as string[]) || [],
           };
           set({ user, isAuthenticated: true, isLoading: false });
@@ -148,8 +180,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       email: (payload.username as string) || (payload.email as string) || "",
       firstName: "",
       lastName: "",
+      avatarUrl: null,
       roles: (payload.roles as string[]) || [],
     };
     set({ user, isAuthenticated: true, isLoading: false });
+    // Fetch full profile in background
+    get().fetchProfile();
   },
 }));

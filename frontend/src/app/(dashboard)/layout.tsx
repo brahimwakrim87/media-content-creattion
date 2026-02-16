@@ -200,9 +200,17 @@ export default function DashboardLayout({
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                {displayName.charAt(0).toUpperCase()}
-              </div>
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt=""
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="hidden sm:inline">{displayName}</span>
               <ChevronDown className="h-4 w-4 text-gray-400" />
             </button>
@@ -222,6 +230,14 @@ export default function DashboardLayout({
                       {user?.email}
                     </p>
                   </div>
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
