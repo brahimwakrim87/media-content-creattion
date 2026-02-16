@@ -55,6 +55,16 @@ services:
           cpus: "0.25"
           memory: 256M
 
+  mercure:
+    environment:
+      MERCURE_PUBLISHER_JWT_KEY: "${MERCURE_JWT_SECRET}"
+      MERCURE_SUBSCRIBER_JWT_KEY: "${MERCURE_JWT_SECRET}"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
   n8n:
     env_file: .env.prod
     environment:

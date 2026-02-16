@@ -6,6 +6,9 @@ use App\Entity\Notification;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\Authorization;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/notifications')]
@@ -13,6 +16,7 @@ class NotificationController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly Authorization $authorization,
     ) {
     }
 
@@ -52,5 +56,52 @@ class NotificationController extends AbstractController
             ->execute();
 
         return $this->json(['updated' => $updated]);
+    }
+
+    #[Route('/clear-read', methods: ['DELETE'], priority: 10)]
+    public function clearRead(): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $user = $this->getUser();
+
+        $deleted = $this->em->createQueryBuilder()
+            ->delete(Notification::class, 'n')
+            ->andWhere('n.user = :user')
+            ->andWhere('n.isRead = true')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+
+        return $this->json(['deleted' => $deleted]);
+    }
+
+    #[Route('/{id}', methods: ['DELETE'], priority: 5)]
+    public function delete(string $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $user = $this->getUser();
+
+        $notification = $this->em->getRepository(Notification::class)->find($id);
+        if (!$notification || $notification->getUser() !== $user) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->em->remove($notification);
+        $this->em->flush();
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/mercure-auth', methods: ['GET'], priority: 10)]
+    public function mercureAuth(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $user = $this->getUser();
+        $topic = 'notifications/' . $user->getId()->toRfc4122();
+
+        $response = new JsonResponse(['topic' => $topic]);
+        $this->authorization->setCookie($request, $response, [$topic]);
+
+        return $response;
     }
 }

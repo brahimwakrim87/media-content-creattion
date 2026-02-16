@@ -14,13 +14,16 @@ import {
   Users,
   Settings,
   Shield,
+  Bell,
   Menu,
   X,
   LogOut,
   ChevronDown,
 } from "lucide-react";
+import { Toaster, toast } from "sonner";
 import { useAuthStore } from "@/lib/auth";
 import { NotificationBell } from "@/components/notification-bell";
+import { useRealtimeNotifications } from "@/lib/hooks/use-realtime";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -31,6 +34,7 @@ const navItems = [
   { href: "/dashboard/publications", label: "Publications", icon: Send },
   { href: "/dashboard/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   { href: "/dashboard/accounts", label: "Accounts", icon: Users },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ] as const;
@@ -49,6 +53,18 @@ export default function DashboardLayout({
   const { user, isAuthenticated, isLoading, logout, checkAuth } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  useRealtimeNotifications((notification) => {
+    toast(notification.title, {
+      description: notification.message ?? undefined,
+      action: notification.data?.link
+        ? {
+            label: "View",
+            onClick: () => router.push(notification.data!.link as string),
+          }
+        : undefined,
+    });
+  });
 
   useEffect(() => {
     checkAuth();
@@ -83,6 +99,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-gray-100">
+      <Toaster position="top-right" richColors closeButton />
+
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div

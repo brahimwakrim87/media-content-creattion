@@ -122,7 +122,7 @@ export function NotificationBell() {
                 </button>
               )}
             </div>
-            <div className="max-h-96 divide-y overflow-y-auto">
+            <div className="max-h-80 divide-y overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="flex h-32 items-center justify-center text-sm text-gray-400">
                   No notifications yet
@@ -139,6 +139,17 @@ export function NotificationBell() {
                   />
                 ))
               )}
+            </div>
+            <div className="border-t px-4 py-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  router.push("/dashboard/notifications");
+                }}
+                className="w-full text-center text-xs font-medium text-blue-600 hover:underline"
+              >
+                View all notifications
+              </button>
             </div>
           </div>
         </>

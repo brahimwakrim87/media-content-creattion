@@ -13,11 +13,13 @@ export interface NotificationItem {
   createdAt: string;
 }
 
-export function useNotifications() {
+export function useNotifications(page = 1) {
   return useQuery({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", page],
     queryFn: () =>
-      apiFetch<HydraCollection<NotificationItem>>("/notifications"),
+      apiFetch<HydraCollection<NotificationItem>>(
+        `/notifications?page=${page}`
+      ),
   });
 }
 
@@ -50,6 +52,28 @@ export function useMarkAllRead() {
   return useMutation({
     mutationFn: () =>
       apiFetch("/notifications/mark-all-read", { method: "PATCH" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+}
+
+export function useDeleteNotification() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiFetch(`/notifications/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+}
+
+export function useClearReadNotifications() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      apiFetch("/notifications/clear-read", { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },

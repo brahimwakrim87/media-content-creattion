@@ -147,6 +147,24 @@ services:
     networks:
       - dmcc
 
+  mercure:
+    image: dunglas/mercure:latest
+    environment:
+      SERVER_NAME: ':3001'
+      MERCURE_PUBLISHER_JWT_KEY: "${MERCURE_JWT_SECRET:-!M3rcur3JwtS3cretK3y!}"
+      MERCURE_SUBSCRIBER_JWT_KEY: "${MERCURE_JWT_SECRET:-!M3rcur3JwtS3cretK3y!}"
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins https://mmc.ilinqsoft.com
+        subscriptions
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - dmcc
+
   certbot:
     image: certbot/certbot:latest
     volumes:

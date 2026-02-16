@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Message\SendNotification;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -15,6 +17,7 @@ final class SendNotificationHandler
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly LoggerInterface $logger,
+        private readonly HubInterface $hub,
     ) {
     }
 
@@ -38,6 +41,28 @@ final class SendNotificationHandler
 
         $this->em->persist($notification);
         $this->em->flush();
+
+        // Publish real-time update via Mercure
+        try {
+            $this->hub->publish(new Update(
+                'notifications/' . $message->getUserId(),
+                json_encode([
+                    'id' => $notification->getId()->toRfc4122(),
+                    'type' => $notification->getType(),
+                    'title' => $notification->getTitle(),
+                    'message' => $notification->getMessage(),
+                    'data' => $notification->getData(),
+                    'isRead' => false,
+                    'createdAt' => $notification->getCreatedAt()->format(\DateTimeInterface::ATOM),
+                ]),
+                true // private update
+            ));
+        } catch (\Throwable $e) {
+            $this->logger->warning('Mercure publish failed', [
+                'userId' => $message->getUserId(),
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         $this->logger->info('Notification created', [
             'userId' => $message->getUserId(),
