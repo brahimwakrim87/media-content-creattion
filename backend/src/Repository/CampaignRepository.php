@@ -44,4 +44,49 @@ class CampaignRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByStatusForUser(User $owner): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('c.status, COUNT(c.id) AS cnt')
+            ->andWhere('c.owner = :owner')
+            ->setParameter('owner', $owner)
+            ->groupBy('c.status')
+            ->getQuery()
+            ->getScalarResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['status']] = (int) $row['cnt'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<int, array{id: string, name: string, status: string, contentCount: int}>
+     */
+    public function topCampaignsByContentCount(User $owner, int $limit = 5): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('c.id, c.name, c.status, COUNT(co.id) AS contentCount')
+            ->leftJoin('c.campaignObjects', 'co')
+            ->andWhere('c.owner = :owner')
+            ->setParameter('owner', $owner)
+            ->groupBy('c.id, c.name, c.status')
+            ->orderBy('contentCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (array $row) => [
+            'id' => (string) $row['id'],
+            'name' => $row['name'],
+            'status' => $row['status'],
+            'contentCount' => (int) $row['contentCount'],
+        ], $rows);
+    }
 }

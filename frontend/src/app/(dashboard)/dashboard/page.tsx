@@ -5,14 +5,23 @@ import {
   BarChart3,
   FileText,
   Megaphone,
-  TrendingUp,
+  Sparkles,
   Video,
   Image,
   Newspaper,
 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 import { useAuthStore } from "@/lib/auth";
 import { useCampaigns } from "@/lib/hooks/use-campaigns";
 import { useContentList } from "@/lib/hooks/use-content";
+import { useAnalytics } from "@/lib/hooks/use-analytics";
 import { StatusBadge } from "@/components/status-badge";
 
 const typeIcons: Record<string, typeof Video> = {
@@ -23,60 +32,76 @@ const typeIcons: Record<string, typeof Video> = {
   advertisement: Megaphone,
 };
 
+function formatMonth(month: string): string {
+  const [year, m] = month.split("-");
+  const date = new Date(Number(year), Number(m) - 1);
+  return date.toLocaleDateString("en", { month: "short" });
+}
+
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const { data: campaignsData } = useCampaigns();
   const { data: contentData } = useContentList();
+  const { data: analytics } = useAnalytics();
 
   const campaigns = campaignsData?.member ?? [];
   const content = contentData?.member ?? [];
-  const totalCampaigns = campaignsData?.totalItems ?? 0;
-  const totalContent = contentData?.totalItems ?? 0;
-  const activeCampaigns = campaigns.filter((c) => c.status === "active").length;
 
   const stats = [
     {
       label: "Total Campaigns",
-      value: String(totalCampaigns),
-      sub: `${activeCampaigns} active`,
+      value: String(analytics?.campaigns.total ?? campaigns.length),
+      sub: `${analytics?.campaigns.byStatus?.active ?? 0} active`,
       icon: Megaphone,
       color: "bg-blue-50 text-blue-700",
     },
     {
       label: "Content Pieces",
-      value: String(totalContent),
+      value: String(analytics?.content.total ?? content.length),
       sub: "across all campaigns",
       icon: FileText,
       color: "bg-green-50 text-green-700",
     },
     {
       label: "Published",
-      value: String(content.filter((c) => c.status === "published").length),
+      value: String(analytics?.content.byStatus?.published ?? 0),
       sub: "content items",
       icon: BarChart3,
       color: "bg-purple-50 text-purple-700",
     },
     {
-      label: "In Progress",
-      value: String(
-        content.filter((c) => ["draft", "ready", "approved"].includes(c.status))
-          .length
-      ),
-      sub: "awaiting action",
-      icon: TrendingUp,
+      label: "AI Generations",
+      value: String(analytics?.generations.total ?? 0),
+      sub: `${analytics?.generations.completed ?? 0} completed`,
+      icon: Sparkles,
       color: "bg-orange-50 text-orange-700",
     },
   ];
 
+  const trendData = (analytics?.monthlyTrends ?? []).map((t) => ({
+    month: formatMonth(t.month),
+    content: t.content,
+    publications: t.publications,
+    generations: t.generations,
+  }));
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back{user?.firstName ? `, ${user.firstName}` : ""}!
-        </h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Here&apos;s an overview of your media content activity.
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back{user?.firstName ? `, ${user.firstName}` : ""}!
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Here&apos;s an overview of your media content activity.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/analytics"
+          className="text-sm font-medium text-blue-600 hover:underline"
+        >
+          View full analytics
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -102,6 +127,41 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Mini trend chart */}
+      {trendData.length > 0 && (
+        <div className="mt-6 rounded-xl border bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900">Activity Trend</h2>
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={trendData}>
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Area
+                type="monotone"
+                dataKey="content"
+                name="Content"
+                stroke="#10B981"
+                fill="#10B98133"
+              />
+              <Area
+                type="monotone"
+                dataKey="publications"
+                name="Publications"
+                stroke="#8B5CF6"
+                fill="#8B5CF633"
+              />
+              <Area
+                type="monotone"
+                dataKey="generations"
+                name="Generations"
+                stroke="#F59E0B"
+                fill="#F59E0B33"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border bg-white p-6 shadow-sm">
