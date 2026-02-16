@@ -1,18 +1,34 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface UploadResponse {
+  id: string;
   url: string;
   filename: string;
+  originalFilename: string;
   mimeType: string;
   size: number;
+  width: number | null;
+  height: number | null;
+  mediaType: "image" | "video" | "other";
+  folder: string | null;
+  createdAt: string;
 }
 
 export function useMediaUpload() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (file: File): Promise<UploadResponse> => {
+    mutationFn: async (
+      fileOrOpts: File | { file: File; folder?: string }
+    ): Promise<UploadResponse> => {
       const token = localStorage.getItem("access_token");
       const formData = new FormData();
-      formData.append("file", file);
+
+      if (fileOrOpts instanceof File) {
+        formData.append("file", fileOrOpts);
+      } else {
+        formData.append("file", fileOrOpts.file);
+        if (fileOrOpts.folder) formData.append("folder", fileOrOpts.folder);
+      }
 
       const response = await fetch("/api/media/upload", {
         method: "POST",
@@ -28,6 +44,9 @@ export function useMediaUpload() {
       }
 
       return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-library"] });
     },
   });
 }

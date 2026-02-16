@@ -11,6 +11,7 @@ use App\Entity\CampaignMember;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
 use App\Entity\GenerationJob;
+use App\Entity\MediaAsset;
 use App\Entity\Notification;
 use App\Entity\Publication;
 use Doctrine\ORM\QueryBuilder;
@@ -96,6 +97,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
         if ($resourceClass === Notification::class) {
             $queryBuilder->andWhere(sprintf('%s.user = :current_user', $rootAlias))
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === MediaAsset::class) {
+            $queryBuilder->andWhere(sprintf('%s.uploadedBy = :current_user', $rootAlias))
                 ->setParameter('current_user', $user);
         }
     }
