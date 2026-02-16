@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Comment;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
@@ -43,5 +44,18 @@ class CommentRepository extends ServiceEntityRepository
             ->setParameter('entityId', $entityId)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function countForOwner(User $owner): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $row = $conn->executeQuery(
+            "SELECT COUNT(cm.id) AS cnt FROM comment cm
+             WHERE (cm.entity_type = 'Campaign' AND cm.entity_id IN (SELECT c.id FROM campaign c WHERE c.owner_id = :owner))
+             OR (cm.entity_type = 'CampaignObject' AND cm.entity_id IN (SELECT co.id FROM campaign_object co JOIN campaign c2 ON co.campaign_id = c2.id WHERE c2.owner_id = :owner))",
+            ['owner' => $owner->getId()->toRfc4122()]
+        )->fetchAssociative();
+
+        return (int) ($row['cnt'] ?? 0);
     }
 }

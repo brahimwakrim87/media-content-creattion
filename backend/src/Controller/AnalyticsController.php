@@ -2,14 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Campaign;
 use App\Entity\User;
 use App\Repository\AuditLogRepository;
+use App\Repository\CampaignMemberRepository;
 use App\Repository\CampaignObjectRepository;
 use App\Repository\CampaignRepository;
+use App\Repository\CommentRepository;
 use App\Repository\GenerationJobRepository;
 use App\Repository\PublicationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AnalyticsController extends AbstractController
@@ -20,34 +24,44 @@ class AnalyticsController extends AbstractController
         private readonly PublicationRepository $publicationRepo,
         private readonly GenerationJobRepository $generationRepo,
         private readonly AuditLogRepository $auditLogRepo,
+        private readonly CampaignMemberRepository $memberRepo,
+        private readonly CommentRepository $commentRepo,
     ) {
     }
 
     #[Route('/api/analytics/dashboard', name: 'api_analytics_dashboard', methods: ['GET'])]
-    public function dashboard(): JsonResponse
+    public function dashboard(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         /** @var User $user */
         $user = $this->getUser();
 
-        $campaignsByStatus = $this->campaignRepo->countByStatusForUser($user);
-        $totalCampaigns = $this->campaignRepo->countByOwner($user);
+        $period = $request->query->get('period', 'all');
+        $since = $this->periodToDate($period);
 
-        $contentByType = $this->contentRepo->countByTypeForUser($user);
-        $contentByStatus = $this->contentRepo->countByStatusForUser($user);
-        $totalContent = $this->contentRepo->countForUser($user);
+        $campaignsByStatus = $this->campaignRepo->countByStatusForUser($user, $since);
+        $totalCampaigns = array_sum($campaignsByStatus) ?: $this->campaignRepo->countByOwner($user);
 
-        $totalPublications = $this->publicationRepo->countForUser($user);
-        $publicationsByPlatform = $this->publicationRepo->countByPlatformForUser($user);
-        $publicationsByStatus = $this->publicationRepo->countByStatusForUser($user);
+        $contentByType = $this->contentRepo->countByTypeForUser($user, $since);
+        $contentByStatus = $this->contentRepo->countByStatusForUser($user, $since);
+        $totalContent = array_sum($contentByStatus) ?: $this->contentRepo->countForUser($user);
 
-        $generationStats = $this->generationRepo->statsForUser($user);
-        $generationsByProvider = $this->generationRepo->countByProviderForUser($user);
+        $totalPublications = $this->publicationRepo->countForUser($user, $since);
+        $publicationsByPlatform = $this->publicationRepo->countByPlatformForUser($user, $since);
+        $publicationsByStatus = $this->publicationRepo->countByStatusForUser($user, $since);
 
-        $monthlyContent = $this->contentRepo->monthlyCreatedForUser($user);
-        $monthlyPublications = $this->publicationRepo->monthlyForUser($user);
-        $monthlyGenerations = $this->generationRepo->monthlyForUser($user);
+        $generationStats = $this->generationRepo->statsForUser($user, $since);
+        $generationsByProvider = $this->generationRepo->countByProviderForUser($user, $since);
+
+        $months = match ($period) {
+            '7d', '30d' => 2,
+            '90d' => 4,
+            default => 6,
+        };
+        $monthlyContent = $this->contentRepo->monthlyCreatedForUser($user, $months);
+        $monthlyPublications = $this->publicationRepo->monthlyForUser($user, $months);
+        $monthlyGenerations = $this->generationRepo->monthlyForUser($user, $months);
         $monthlyTrends = $this->mergeMonthlyData($monthlyContent, $monthlyPublications, $monthlyGenerations);
 
         $topCampaigns = $this->campaignRepo->topCampaignsByContentCount($user);
@@ -61,6 +75,19 @@ class AnalyticsController extends AbstractController
             'createdAt' => $log->getCreatedAt()->format(\DateTimeInterface::ATOM),
         ], $recentLogs);
 
+        // Content pipeline: ordered status counts
+        $pipeline = [];
+        foreach (['draft', 'generating', 'ready', 'approved', 'published'] as $status) {
+            $pipeline[] = [
+                'status' => $status,
+                'count' => $contentByStatus[$status] ?? 0,
+            ];
+        }
+
+        // Team stats
+        $teamMemberCount = $this->memberRepo->countForOwner($user);
+        $totalComments = $this->commentRepo->countForOwner($user);
+
         return $this->json([
             'campaigns' => [
                 'total' => $totalCampaigns,
@@ -70,6 +97,7 @@ class AnalyticsController extends AbstractController
                 'total' => $totalContent,
                 'byType' => $contentByType,
                 'byStatus' => $contentByStatus,
+                'pipeline' => $pipeline,
             ],
             'publications' => [
                 'total' => $totalPublications,
@@ -84,10 +112,81 @@ class AnalyticsController extends AbstractController
                 'avgProcessingTimeMs' => $generationStats['avgProcessingTimeMs'],
                 'byProvider' => $generationsByProvider,
             ],
+            'team' => [
+                'members' => $teamMemberCount,
+                'comments' => $totalComments,
+            ],
             'monthlyTrends' => $monthlyTrends,
             'topCampaigns' => $topCampaigns,
             'recentActivity' => $recentActivity,
         ]);
+    }
+
+    #[Route('/api/analytics/campaigns/{id}', name: 'api_analytics_campaign', methods: ['GET'], priority: 10)]
+    public function campaignDetail(Campaign $campaign): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$campaign->hasAccess($user)) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $contentByType = $this->contentRepo->countByTypeForCampaign($campaign);
+        $contentByStatus = $this->contentRepo->countByStatusForCampaign($campaign);
+        $publicationsByPlatform = $this->publicationRepo->countByPlatformForCampaign($campaign);
+        $publicationsByStatus = $this->publicationRepo->countByStatusForCampaign($campaign);
+        $generationStats = $this->generationRepo->statsForCampaign($campaign);
+
+        $pipeline = [];
+        foreach (['draft', 'generating', 'ready', 'approved', 'published'] as $status) {
+            $pipeline[] = [
+                'status' => $status,
+                'count' => $contentByStatus[$status] ?? 0,
+            ];
+        }
+
+        $members = $this->memberRepo->findByCampaign($campaign);
+        $teamMembers = array_map(fn ($m) => [
+            'id' => $m->getUser()->getId()->toRfc4122(),
+            'name' => trim($m->getUser()->getFirstName() . ' ' . $m->getUser()->getLastName()),
+            'email' => $m->getUser()->getEmail(),
+            'role' => $m->getRole(),
+        ], $members);
+
+        return $this->json([
+            'campaign' => [
+                'id' => $campaign->getId()->toRfc4122(),
+                'name' => $campaign->getName(),
+                'status' => $campaign->getStatus(),
+            ],
+            'content' => [
+                'total' => array_sum($contentByStatus),
+                'byType' => $contentByType,
+                'byStatus' => $contentByStatus,
+                'pipeline' => $pipeline,
+            ],
+            'publications' => [
+                'total' => array_sum($publicationsByStatus),
+                'byPlatform' => $publicationsByPlatform,
+                'byStatus' => $publicationsByStatus,
+            ],
+            'generations' => $generationStats,
+            'team' => $teamMembers,
+        ]);
+    }
+
+    private function periodToDate(string $period): ?\DateTimeImmutable
+    {
+        return match ($period) {
+            '7d' => new \DateTimeImmutable('-7 days'),
+            '30d' => new \DateTimeImmutable('-30 days'),
+            '90d' => new \DateTimeImmutable('-90 days'),
+            '12m' => new \DateTimeImmutable('-12 months'),
+            default => null,
+        };
     }
 
     /**

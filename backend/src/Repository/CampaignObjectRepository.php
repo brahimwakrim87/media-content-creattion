@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Campaign;
 use App\Entity\CampaignObject;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -44,16 +45,20 @@ class CampaignObjectRepository extends ServiceEntityRepository
     /**
      * @return array<string, int>
      */
-    public function countByTypeForUser(User $owner): array
+    public function countByTypeForUser(User $owner, ?\DateTimeImmutable $since = null): array
     {
-        $rows = $this->createQueryBuilder('co')
+        $qb = $this->createQueryBuilder('co')
             ->select('co.type, COUNT(co.id) AS cnt')
             ->join('co.campaign', 'c')
             ->andWhere('c.owner = :owner')
             ->setParameter('owner', $owner)
-            ->groupBy('co.type')
-            ->getQuery()
-            ->getScalarResult();
+            ->groupBy('co.type');
+
+        if ($since) {
+            $qb->andWhere('co.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {
@@ -66,16 +71,20 @@ class CampaignObjectRepository extends ServiceEntityRepository
     /**
      * @return array<string, int>
      */
-    public function countByStatusForUser(User $owner): array
+    public function countByStatusForUser(User $owner, ?\DateTimeImmutable $since = null): array
     {
-        $rows = $this->createQueryBuilder('co')
+        $qb = $this->createQueryBuilder('co')
             ->select('co.status, COUNT(co.id) AS cnt')
             ->join('co.campaign', 'c')
             ->andWhere('c.owner = :owner')
             ->setParameter('owner', $owner)
-            ->groupBy('co.status')
-            ->getQuery()
-            ->getScalarResult();
+            ->groupBy('co.status');
+
+        if ($since) {
+            $qb->andWhere('co.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {
@@ -113,5 +122,47 @@ class CampaignObjectRepository extends ServiceEntityRepository
         )->fetchAllAssociative();
 
         return array_map(fn (array $r) => ['month' => $r['month'], 'count' => (int) $r['cnt']], $rows);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByTypeForCampaign(Campaign $campaign): array
+    {
+        $rows = $this->createQueryBuilder('co')
+            ->select('co.type, COUNT(co.id) AS cnt')
+            ->andWhere('co.campaign = :campaign')
+            ->setParameter('campaign', $campaign)
+            ->groupBy('co.type')
+            ->getQuery()
+            ->getScalarResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['type']] = (int) $row['cnt'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByStatusForCampaign(Campaign $campaign): array
+    {
+        $rows = $this->createQueryBuilder('co')
+            ->select('co.status, COUNT(co.id) AS cnt')
+            ->andWhere('co.campaign = :campaign')
+            ->setParameter('campaign', $campaign)
+            ->groupBy('co.status')
+            ->getQuery()
+            ->getScalarResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['status']] = (int) $row['cnt'];
+        }
+
+        return $result;
     }
 }

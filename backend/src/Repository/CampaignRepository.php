@@ -68,15 +68,19 @@ class CampaignRepository extends ServiceEntityRepository
     /**
      * @return array<string, int>
      */
-    public function countByStatusForUser(User $owner): array
+    public function countByStatusForUser(User $owner, ?\DateTimeImmutable $since = null): array
     {
-        $rows = $this->createQueryBuilder('c')
+        $qb = $this->createQueryBuilder('c')
             ->select('c.status, COUNT(c.id) AS cnt')
             ->andWhere('c.owner = :owner')
             ->setParameter('owner', $owner)
-            ->groupBy('c.status')
-            ->getQuery()
-            ->getScalarResult();
+            ->groupBy('c.status');
+
+        if ($since) {
+            $qb->andWhere('c.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {

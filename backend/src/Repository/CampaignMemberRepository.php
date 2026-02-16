@@ -52,4 +52,15 @@ class CampaignMemberRepository extends ServiceEntityRepository
         $member = $this->findMembership($campaign, $user);
         return $member?->getRole();
     }
+
+    public function countForOwner(User $owner): int
+    {
+        return (int) $this->createQueryBuilder('cm')
+            ->select('COUNT(cm.id)')
+            ->join('cm.campaign', 'c')
+            ->andWhere('c.owner = :owner')
+            ->setParameter('owner', $owner)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

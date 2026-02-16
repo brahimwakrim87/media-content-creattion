@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Campaign;
 use App\Entity\Publication;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -54,32 +55,40 @@ class PublicationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function countForUser(User $owner): int
+    public function countForUser(User $owner, ?\DateTimeImmutable $since = null): int
     {
-        return (int) $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->join('p.campaignObject', 'co')
             ->join('co.campaign', 'c')
             ->andWhere('c.owner = :owner')
-            ->setParameter('owner', $owner)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('owner', $owner);
+
+        if ($since) {
+            $qb->andWhere('p.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
      * @return array<string, int>
      */
-    public function countByPlatformForUser(User $owner): array
+    public function countByPlatformForUser(User $owner, ?\DateTimeImmutable $since = null): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p.platform, COUNT(p.id) AS cnt')
             ->join('p.campaignObject', 'co')
             ->join('co.campaign', 'c')
             ->andWhere('c.owner = :owner')
             ->setParameter('owner', $owner)
-            ->groupBy('p.platform')
-            ->getQuery()
-            ->getScalarResult();
+            ->groupBy('p.platform');
+
+        if ($since) {
+            $qb->andWhere('p.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {
@@ -92,17 +101,21 @@ class PublicationRepository extends ServiceEntityRepository
     /**
      * @return array<string, int>
      */
-    public function countByStatusForUser(User $owner): array
+    public function countByStatusForUser(User $owner, ?\DateTimeImmutable $since = null): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p.status, COUNT(p.id) AS cnt')
             ->join('p.campaignObject', 'co')
             ->join('co.campaign', 'c')
             ->andWhere('c.owner = :owner')
             ->setParameter('owner', $owner)
-            ->groupBy('p.status')
-            ->getQuery()
-            ->getScalarResult();
+            ->groupBy('p.status');
+
+        if ($since) {
+            $qb->andWhere('p.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {
@@ -130,5 +143,49 @@ class PublicationRepository extends ServiceEntityRepository
         )->fetchAllAssociative();
 
         return array_map(fn (array $r) => ['month' => $r['month'], 'count' => (int) $r['cnt']], $rows);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByPlatformForCampaign(Campaign $campaign): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('p.platform, COUNT(p.id) AS cnt')
+            ->join('p.campaignObject', 'co')
+            ->andWhere('co.campaign = :campaign')
+            ->setParameter('campaign', $campaign)
+            ->groupBy('p.platform')
+            ->getQuery()
+            ->getScalarResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['platform']] = (int) $row['cnt'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByStatusForCampaign(Campaign $campaign): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('p.status, COUNT(p.id) AS cnt')
+            ->join('p.campaignObject', 'co')
+            ->andWhere('co.campaign = :campaign')
+            ->setParameter('campaign', $campaign)
+            ->groupBy('p.status')
+            ->getQuery()
+            ->getScalarResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['status']] = (int) $row['cnt'];
+        }
+
+        return $result;
     }
 }
