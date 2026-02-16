@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Megaphone, Calendar, DollarSign } from "lucide-react";
+import { Plus, Megaphone, Calendar, DollarSign, Download } from "lucide-react";
 import { useCampaigns, useDeleteCampaign } from "@/lib/hooks/use-campaigns";
+import { useExportCampaigns } from "@/lib/hooks/use-advanced";
+import { toast } from "sonner";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { Pagination } from "@/components/pagination";
@@ -18,6 +20,7 @@ export default function CampaignsPage() {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useCampaigns(page, search);
   const deleteCampaign = useDeleteCampaign();
+  const exportCampaigns = useExportCampaigns();
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -41,13 +44,28 @@ export default function CampaignsPage() {
             Manage your media campaigns
           </p>
         </div>
-        <Link
-          href="/dashboard/campaigns/new"
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4" />
-          New Campaign
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              exportCampaigns.mutate(undefined, {
+                onSuccess: () => toast.success("Campaigns exported"),
+                onError: (e) => toast.error(e.message),
+              });
+            }}
+            disabled={exportCampaigns.isPending}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </button>
+          <Link
+            href="/dashboard/campaigns/new"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4" />
+            New Campaign
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4">

@@ -20,10 +20,12 @@ import {
   X,
   LogOut,
   ChevronDown,
+  ClipboardCheck,
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { useAuthStore } from "@/lib/auth";
 import { NotificationBell } from "@/components/notification-bell";
+import { GlobalSearch } from "@/components/global-search";
 import { useRealtimeNotifications } from "@/lib/hooks/use-realtime";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +34,7 @@ const navItems = [
   { href: "/dashboard/campaigns", label: "Campaigns", icon: Megaphone },
   { href: "/dashboard/content", label: "Content", icon: FileText },
   { href: "/dashboard/ai-studio", label: "AI Studio", icon: Sparkles },
+  { href: "/dashboard/approvals", label: "Approvals", icon: ClipboardCheck },
   { href: "/dashboard/publications", label: "Publications", icon: Send },
   { href: "/dashboard/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
@@ -190,7 +193,8 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </button>
 
-          <div className="flex flex-1 items-center justify-end gap-2">
+          <div className="flex flex-1 items-center justify-end gap-3">
+            <GlobalSearch />
             <NotificationBell />
           </div>
 
