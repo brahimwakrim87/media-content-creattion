@@ -8,11 +8,13 @@ services:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./backend/public:/var/www/backend/public:ro
       - media_storage:/var/www/backend/var/storage/media:ro
+      - certbot_etc:/etc/letsencrypt:ro
+      - certbot_var:/var/www/certbot:ro
     depends_on:
       php-fpm:
-        condition: service_started
+        condition: service_healthy
       next-app:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - dmcc
@@ -54,13 +56,18 @@ services:
     build:
       context: .
       dockerfile: docker/next/Dockerfile
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      args:
+        NEXT_PUBLIC_API_URL: "/api"
+        NEXT_PUBLIC_DOMAIN: "mmc.ilinqsoft.com"
     environment:
       NEXT_PUBLIC_API_URL: "/api"
       NEXT_PUBLIC_DOMAIN: "mmc.ilinqsoft.com"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
     networks:
       - dmcc
@@ -117,11 +124,24 @@ services:
     networks:
       - dmcc
 
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
+      - ./docker/certbot:/scripts:ro
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done'"
+    restart: unless-stopped
+    networks:
+      - dmcc
+
 volumes:
   pg_data:
   redis_data:
   n8n_data:
   media_storage:
+  certbot_etc:
+  certbot_var:
 
 networks:
   dmcc:

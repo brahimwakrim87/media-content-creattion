@@ -1,7 +1,7 @@
 FROM alpine:3.22 AS tools
 RUN apk add --no-cache ffmpeg imagemagick
 
-FROM n8nio/n8n:latest
+FROM n8nio/n8n:1.76.1
 # Copy all shared libraries from Alpine (needed by ffmpeg/imagemagick)
 COPY --from=tools /usr/lib/ /usr/lib/
 COPY --from=tools /usr/bin/ffmpeg /usr/bin/ffmpeg
