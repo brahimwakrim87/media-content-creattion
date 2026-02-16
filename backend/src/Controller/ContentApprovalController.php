@@ -27,7 +27,7 @@ class ContentApprovalController extends AbstractController
     ) {
     }
 
-    #[Route('/api/campaign_objects/{id}/transition', methods: ['POST'])]
+    #[Route('/api/campaign_objects/{id}/transition', methods: ['POST'], priority: 10)]
     public function transition(string $id, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');

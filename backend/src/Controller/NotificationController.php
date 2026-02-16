@@ -16,7 +16,7 @@ class NotificationController extends AbstractController
     ) {
     }
 
-    #[Route('/unread-count', methods: ['GET'])]
+    #[Route('/unread-count', methods: ['GET'], priority: 10)]
     public function unreadCount(): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -34,7 +34,7 @@ class NotificationController extends AbstractController
         return $this->json(['count' => $count]);
     }
 
-    #[Route('/mark-all-read', methods: ['PATCH'])]
+    #[Route('/mark-all-read', methods: ['PATCH'], priority: 10)]
     public function markAllRead(): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
