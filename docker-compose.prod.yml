@@ -39,6 +39,7 @@ services:
           memory: 512M
 
   postgres:
+    env_file: .env.prod
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     deploy:
@@ -55,6 +56,7 @@ services:
           memory: 256M
 
   n8n:
+    env_file: .env.prod
     environment:
       N8N_BASIC_AUTH_PASSWORD: "${N8N_AUTH_PASSWORD}"
       N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY}"
