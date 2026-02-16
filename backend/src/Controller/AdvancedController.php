@@ -237,7 +237,7 @@ class AdvancedController extends AbstractController
     /**
      * Export campaigns as CSV.
      */
-    #[Route('/api/campaigns/export', name: 'api_campaigns_export', methods: ['GET'])]
+    #[Route('/api/campaigns/export', name: 'api_campaigns_export', methods: ['GET'], priority: 10)]
     public function exportCampaigns(): StreamedResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
