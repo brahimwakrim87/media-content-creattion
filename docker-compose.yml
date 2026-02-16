@@ -45,6 +45,8 @@ services:
       - ./backend:/var/www/backend
       - media_storage:/var/www/backend/var/storage/media
     env_file: .env.docker
+    healthcheck:
+      disable: true
     depends_on:
       php-fpm:
         condition: service_started
@@ -63,7 +65,7 @@ services:
       NEXT_PUBLIC_API_URL: "/api"
       NEXT_PUBLIC_DOMAIN: "mmc.ilinqsoft.com"
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/ || exit 1"]
+      test: ["CMD-SHELL", "wget --spider -q http://0.0.0.0:3000/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
