@@ -100,7 +100,8 @@ class NotificationController extends AbstractController
         $topic = 'notifications/' . $user->getId()->toRfc4122();
 
         $response = new JsonResponse(['topic' => $topic]);
-        $this->authorization->setCookie($request, $response, [$topic]);
+        $cookie = $this->authorization->setCookie($request, [$topic]);
+        $response->headers->setCookie($cookie);
 
         return $response;
     }
