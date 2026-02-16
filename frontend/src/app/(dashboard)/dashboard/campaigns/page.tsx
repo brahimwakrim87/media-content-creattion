@@ -7,6 +7,7 @@ import { useCampaigns, useDeleteCampaign } from "@/lib/hooks/use-campaigns";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { Pagination } from "@/components/pagination";
+import { SearchInput } from "@/components/search-input";
 import { cn } from "@/lib/utils";
 
 const statusFilters = ["all", "draft", "active", "paused", "completed"] as const;
@@ -14,8 +15,14 @@ const statusFilters = ["all", "draft", "active", "paused", "completed"] as const
 export default function CampaignsPage() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const { data, isLoading } = useCampaigns(page);
+  const [search, setSearch] = useState("");
+  const { data, isLoading } = useCampaigns(page, search);
   const deleteCampaign = useDeleteCampaign();
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const campaigns = data?.member ?? [];
   const totalItems = data?.totalItems ?? 0;
@@ -41,6 +48,14 @@ export default function CampaignsPage() {
           <Plus className="h-4 w-4" />
           New Campaign
         </Link>
+      </div>
+
+      <div className="mb-4">
+        <SearchInput
+          value={search}
+          onChange={handleSearch}
+          placeholder="Search campaigns..."
+        />
       </div>
 
       <div className="mb-4 flex gap-2">

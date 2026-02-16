@@ -53,7 +53,7 @@ export default function NewPublicationPage() {
       }
 
       await createPublication.mutateAsync(
-        payload as Parameters<typeof createPublication.mutateAsync>[0]
+        payload as unknown as Parameters<typeof createPublication.mutateAsync>[0]
       );
       router.push("/dashboard/publications");
     } catch (err) {

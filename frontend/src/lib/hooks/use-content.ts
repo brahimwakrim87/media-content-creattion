@@ -34,13 +34,16 @@ export interface CreateContentInput {
   tags?: string[]; // IRIs: /api/tags/{id}
 }
 
-export function useContentList(page = 1) {
+export function useContentList(page = 1, search = "") {
   return useQuery({
-    queryKey: ["content", page],
-    queryFn: () =>
-      apiFetch<HydraCollection<ContentItem>>(
-        `/campaign_objects?page=${page}`
-      ),
+    queryKey: ["content", page, search],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page) });
+      if (search) params.set("title", search);
+      return apiFetch<HydraCollection<ContentItem>>(
+        `/campaign_objects?${params}`
+      );
+    },
   });
 }
 
@@ -90,6 +93,21 @@ export function useUpdateContent(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["content"] });
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
+    },
+  });
+}
+
+export function useContentTransition(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { action: string; comment?: string }) =>
+      apiFetch(`/campaign_objects/${id}/transition`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["content"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 }

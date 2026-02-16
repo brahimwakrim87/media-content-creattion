@@ -10,6 +10,7 @@ use App\Entity\Campaign;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
 use App\Entity\GenerationJob;
+use App\Entity\Notification;
 use App\Entity\Publication;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -77,6 +78,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
         if ($resourceClass === GenerationJob::class) {
             $queryBuilder->andWhere(sprintf('%s.requestedBy = :current_user', $rootAlias))
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === Notification::class) {
+            $queryBuilder->andWhere(sprintf('%s.user = :current_user', $rootAlias))
                 ->setParameter('current_user', $user);
         }
     }

@@ -12,12 +12,14 @@ import {
   BarChart3,
   Users,
   Settings,
+  Shield,
   Menu,
   X,
   LogOut,
   ChevronDown,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
+import { NotificationBell } from "@/components/notification-bell";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -29,7 +31,11 @@ const navItems = [
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/accounts", label: "Accounts", icon: Users },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
-];
+] as const;
+
+const adminNavItems = [
+  { href: "/dashboard/users", label: "Users", icon: Shield },
+] as const;
 
 export default function DashboardLayout({
   children,
@@ -124,6 +130,30 @@ export default function DashboardLayout({
               </Link>
             );
           })}
+          {user?.roles?.includes("ROLE_ADMIN") && (
+            <>
+              <div className="my-2 border-t" />
+              {adminNavItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </>
+          )}
         </nav>
       </aside>
 
@@ -138,7 +168,9 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </button>
 
-          <div className="flex-1" />
+          <div className="flex flex-1 items-center justify-end gap-2">
+            <NotificationBell />
+          </div>
 
           {/* User menu */}
           <div className="relative">

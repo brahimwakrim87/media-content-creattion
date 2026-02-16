@@ -8,6 +8,7 @@ import { getPlatformIcon, getPlatformColor } from "@/lib/platform-icons";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { Pagination } from "@/components/pagination";
+import { SearchInput } from "@/components/search-input";
 import { cn, formatDateTime } from "@/lib/utils";
 
 const statusFilters = [
@@ -22,7 +23,13 @@ const statusFilters = [
 export default function PublicationsPage() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const { data, isLoading } = usePublications(page);
+  const [search, setSearch] = useState("");
+  const { data, isLoading } = usePublications(page, search);
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const publications = data?.member ?? [];
   const totalItems = data?.totalItems ?? 0;
@@ -48,6 +55,14 @@ export default function PublicationsPage() {
           <Plus className="h-4 w-4" />
           New Publication
         </Link>
+      </div>
+
+      <div className="mb-4">
+        <SearchInput
+          value={search}
+          onChange={handleSearch}
+          placeholder="Filter by platform..."
+        />
       </div>
 
       <div className="mb-4 flex gap-2">

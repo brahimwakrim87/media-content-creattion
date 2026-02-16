@@ -14,6 +14,7 @@ import { useContentList } from "@/lib/hooks/use-content";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { Pagination } from "@/components/pagination";
+import { SearchInput } from "@/components/search-input";
 import { cn } from "@/lib/utils";
 
 const typeFilters = [
@@ -36,7 +37,13 @@ const typeIcons: Record<string, typeof Video> = {
 export default function ContentPage() {
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState("all");
-  const { data, isLoading } = useContentList(page);
+  const [search, setSearch] = useState("");
+  const { data, isLoading } = useContentList(page, search);
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const items = data?.member ?? [];
   const totalItems = data?.totalItems ?? 0;
@@ -62,6 +69,14 @@ export default function ContentPage() {
           <Plus className="h-4 w-4" />
           Create Content
         </Link>
+      </div>
+
+      <div className="mb-4">
+        <SearchInput
+          value={search}
+          onChange={handleSearch}
+          placeholder="Search content..."
+        />
       </div>
 
       <div className="mb-4 flex gap-2">

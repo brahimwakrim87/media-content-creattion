@@ -10,6 +10,7 @@ use App\Entity\Permission;
 use App\Entity\Publication;
 use App\Entity\Role;
 use App\Entity\SocialAccount;
+use App\Entity\SystemSetting;
 use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -363,6 +364,25 @@ class AppFixtures extends Fixture
         $genJob2->setErrorMessage('API rate limit exceeded. Please try again later.');
         $genJob2->setProcessingTimeMs(1200);
         $manager->persist($genJob2);
+
+        // System settings
+        $settingDefs = [
+            ['key' => 'app.name', 'value' => 'MediaHub', 'type' => 'string', 'description' => 'Application display name'],
+            ['key' => 'app.notifications_enabled', 'value' => 'true', 'type' => 'boolean', 'description' => 'Enable email and in-app notifications'],
+            ['key' => 'app.max_upload_size_mb', 'value' => '50', 'type' => 'integer', 'description' => 'Maximum file upload size in megabytes'],
+            ['key' => 'app.default_ai_provider', 'value' => 'anthropic_claude', 'type' => 'string', 'description' => 'Default AI provider for content generation'],
+            ['key' => 'app.auto_approve_content', 'value' => 'false', 'type' => 'boolean', 'description' => 'Automatically approve submitted content without review'],
+            ['key' => 'app.content_review_required', 'value' => 'true', 'type' => 'boolean', 'description' => 'Require content review before publishing'],
+        ];
+
+        foreach ($settingDefs as $def) {
+            $setting = new SystemSetting();
+            $setting->setKey($def['key']);
+            $setting->setValue($def['value']);
+            $setting->setType($def['type']);
+            $setting->setDescription($def['description']);
+            $manager->persist($setting);
+        }
 
         $manager->flush();
     }

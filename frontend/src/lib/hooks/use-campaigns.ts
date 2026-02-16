@@ -56,11 +56,14 @@ export interface CreateCampaignInput {
   tags?: string[];
 }
 
-export function useCampaigns(page = 1) {
+export function useCampaigns(page = 1, search = "") {
   return useQuery({
-    queryKey: ["campaigns", page],
-    queryFn: () =>
-      apiFetch<HydraCollection<Campaign>>(`/campaigns?page=${page}`),
+    queryKey: ["campaigns", page, search],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page) });
+      if (search) params.set("name", search);
+      return apiFetch<HydraCollection<Campaign>>(`/campaigns?${params}`);
+    },
   });
 }
 

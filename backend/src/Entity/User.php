@@ -23,13 +23,21 @@ use Symfony\Component\Uid\Uuid;
 #[UniqueEntity(fields: ['email'], message: 'This email is already in use.')]
 #[ApiResource(
     operations: [
-        new Get(normalizationContext: ['groups' => ['user:read']]),
-        new GetCollection(normalizationContext: ['groups' => ['user:read']]),
+        new Get(
+            normalizationContext: ['groups' => ['user:read']],
+            security: "is_granted('ROLE_ADMIN') or object == user",
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['user:read']],
+            security: "is_granted('ROLE_ADMIN')",
+        ),
         new Patch(
             normalizationContext: ['groups' => ['user:read']],
             denormalizationContext: ['groups' => ['user:update']],
+            security: "is_granted('ROLE_ADMIN') or object == user",
         ),
     ],
+    paginationItemsPerPage: 20,
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -60,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $avatarUrl = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'user:update'])]
     private bool $isActive = true;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]

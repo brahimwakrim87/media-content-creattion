@@ -13,7 +13,7 @@ import {
   Megaphone,
   Sparkles,
 } from "lucide-react";
-import { useContentItem, useUpdateContent, useDeleteContent } from "@/lib/hooks/use-content";
+import { useContentItem, useUpdateContent, useDeleteContent, useContentTransition } from "@/lib/hooks/use-content";
 import { StatusBadge } from "@/components/status-badge";
 import { MediaPreview } from "@/components/media-preview";
 import { MediaUpload } from "@/components/media-upload";
@@ -27,8 +27,6 @@ const typeIcons: Record<string, typeof Video> = {
   advertisement: Megaphone,
 };
 
-const statusFlow = ["draft", "ready", "approved", "published"] as const;
-
 export default function ContentDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -36,10 +34,14 @@ export default function ContentDetailPage() {
   const { data: item, isLoading, refetch } = useContentItem(id);
   const updateContent = useUpdateContent(id);
   const deleteContent = useDeleteContent();
+  const transition = useContentTransition(id);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [changeComment, setChangeComment] = useState("");
+  const [showChangeForm, setShowChangeForm] = useState(false);
 
-  const handleStatusChange = async (newStatus: string) => {
-    await updateContent.mutateAsync({ status: newStatus } as Parameters<typeof updateContent.mutateAsync>[0]);
+  const handleTransition = async (action: string, comment?: string) => {
+    await transition.mutateAsync({ action, comment });
+    refetch();
   };
 
   const handleDelete = async () => {
@@ -146,26 +148,70 @@ export default function ContentDetailPage() {
           </div>
         )}
 
-        {/* Status flow */}
+        {/* Approval workflow */}
         {item.status !== "published" && item.status !== "generating" && (
           <div className="mt-6 border-t pt-4">
             <p className="mb-2 text-xs font-medium uppercase text-gray-500">
-              Change Status
+              Workflow
             </p>
-            <div className="flex gap-2">
-              {statusFlow
-                .filter((s) => s !== item.status)
-                .map((s) => (
+            <div className="flex flex-wrap items-center gap-2">
+              {item.status === "draft" && (
+                <button
+                  onClick={() => handleTransition("submit_review")}
+                  disabled={transition.isPending}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Submit for Review
+                </button>
+              )}
+              {item.status === "ready" && (
+                <>
                   <button
-                    key={s}
-                    onClick={() => handleStatusChange(s)}
-                    disabled={updateContent.isPending}
-                    className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium capitalize text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    onClick={() => handleTransition("approve")}
+                    disabled={transition.isPending}
+                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
                   >
-                    {s}
+                    Approve
                   </button>
-                ))}
+                  <button
+                    onClick={() => setShowChangeForm(!showChangeForm)}
+                    className="rounded-lg border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100"
+                  >
+                    Request Changes
+                  </button>
+                </>
+              )}
+              {item.status === "approved" && (
+                <button
+                  onClick={() => setShowChangeForm(!showChangeForm)}
+                  className="rounded-lg border border-amber-400 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100"
+                >
+                  Request Changes
+                </button>
+              )}
             </div>
+            {showChangeForm && (
+              <div className="mt-3 space-y-2">
+                <textarea
+                  value={changeComment}
+                  onChange={(e) => setChangeComment(e.target.value)}
+                  placeholder="Describe what changes are needed..."
+                  rows={3}
+                  className="w-full rounded-lg border p-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+                <button
+                  onClick={async () => {
+                    await handleTransition("request_changes", changeComment || undefined);
+                    setChangeComment("");
+                    setShowChangeForm(false);
+                  }}
+                  disabled={transition.isPending}
+                  className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+                >
+                  {transition.isPending ? "Sending..." : "Send Change Request"}
+                </button>
+              </div>
+            )}
           </div>
         )}
 

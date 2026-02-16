@@ -62,7 +62,7 @@ export default function NewContentPage() {
       }
 
       const item = await createContent.mutateAsync(
-        payload as Parameters<typeof createContent.mutateAsync>[0]
+        payload as unknown as Parameters<typeof createContent.mutateAsync>[0]
       );
       router.push(`/dashboard/content/${item.id}`);
     } catch (err) {

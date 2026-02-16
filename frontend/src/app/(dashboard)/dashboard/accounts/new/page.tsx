@@ -53,7 +53,7 @@ export default function NewAccountPage() {
       if (data.accountType) payload.accountType = data.accountType;
 
       const account = await createAccount.mutateAsync(
-        payload as Parameters<typeof createAccount.mutateAsync>[0]
+        payload as unknown as Parameters<typeof createAccount.mutateAsync>[0]
       );
       router.push(`/dashboard/accounts/${account.id}`);
     } catch (err) {

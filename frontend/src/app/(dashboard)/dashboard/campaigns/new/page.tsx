@@ -35,7 +35,8 @@ export default function NewCampaignPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CampaignFormData>({
-    resolver: zodResolver(campaignSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(campaignSchema) as any,
     defaultValues: { status: "draft" },
   });
 
@@ -55,7 +56,7 @@ export default function NewCampaignPage() {
       }
 
       const campaign = await createCampaign.mutateAsync(
-        payload as Parameters<typeof createCampaign.mutateAsync>[0]
+        payload as unknown as Parameters<typeof createCampaign.mutateAsync>[0]
       );
       router.push(`/dashboard/campaigns/${campaign.id}`);
     } catch (err) {

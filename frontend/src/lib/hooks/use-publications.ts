@@ -33,11 +33,14 @@ export interface CreatePublicationInput {
   scheduledAt?: string;
 }
 
-export function usePublications(page = 1) {
+export function usePublications(page = 1, search = "") {
   return useQuery({
-    queryKey: ["publications", page],
-    queryFn: () =>
-      apiFetch<HydraCollection<Publication>>(`/publications?page=${page}`),
+    queryKey: ["publications", page, search],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page) });
+      if (search) params.set("platform", search);
+      return apiFetch<HydraCollection<Publication>>(`/publications?${params}`);
+    },
   });
 }
 

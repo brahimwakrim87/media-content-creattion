@@ -14,13 +14,21 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity]
 #[ApiResource(
     operations: [
-        new Get(normalizationContext: ['groups' => ['notification:read']]),
-        new GetCollection(normalizationContext: ['groups' => ['notification:read']]),
+        new Get(
+            normalizationContext: ['groups' => ['notification:read']],
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['notification:read']],
+        ),
         new Patch(
             normalizationContext: ['groups' => ['notification:read']],
             denormalizationContext: ['groups' => ['notification:update']],
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
         ),
     ],
+    order: ['createdAt' => 'DESC'],
+    paginationItemsPerPage: 10,
 )]
 class Notification
 {
