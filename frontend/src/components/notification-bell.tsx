@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Sparkles, Send, FileText, Megaphone, Info } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, Sparkles, Send, FileText, Megaphone, Info, AtSign, UserPlus } from "lucide-react";
 import {
   useNotifications,
   useUnreadCount,
@@ -16,19 +17,24 @@ const typeIcons: Record<string, typeof Info> = {
   generation: Sparkles,
   publication: Send,
   campaign: Megaphone,
+  mention: AtSign,
+  member: UserPlus,
 };
 
 function NotificationRow({
   notification,
+  onNavigate,
 }: {
   notification: {
     id: string;
     type: string;
     title: string;
     message: string | null;
+    data: Record<string, unknown> | null;
     isRead: boolean;
     createdAt: string;
   };
+  onNavigate: (link: string) => void;
 }) {
   const markRead = useMarkNotificationRead(notification.id);
   const Icon = typeIcons[notification.type] || Info;
@@ -37,6 +43,8 @@ function NotificationRow({
     <button
       onClick={() => {
         if (!notification.isRead) markRead.mutate();
+        const link = notification.data?.link as string | undefined;
+        if (link) onNavigate(link);
       }}
       className={cn(
         "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50",
@@ -75,6 +83,7 @@ function NotificationRow({
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const { data: countData } = useUnreadCount();
   const { data: notificationsData } = useNotifications();
   const markAllRead = useMarkAllRead();
@@ -120,7 +129,14 @@ export function NotificationBell() {
                 </div>
               ) : (
                 notifications.map((n) => (
-                  <NotificationRow key={n.id} notification={n} />
+                  <NotificationRow
+                    key={n.id}
+                    notification={n}
+                    onNavigate={(link) => {
+                      setOpen(false);
+                      router.push(link);
+                    }}
+                  />
                 ))
               )}
             </div>

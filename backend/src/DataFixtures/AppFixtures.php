@@ -3,8 +3,10 @@
 namespace App\DataFixtures;
 
 use App\Entity\Campaign;
+use App\Entity\CampaignMember;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
+use App\Entity\Comment;
 use App\Entity\GenerationJob;
 use App\Entity\Permission;
 use App\Entity\Publication;
@@ -135,6 +137,26 @@ class AppFixtures extends Fixture
         $admin->addRoleEntity($roles['admin']);
 
         $manager->persist($admin);
+
+        // Create editor user
+        $editor = new User();
+        $editor->setEmail('editor@dmcc.local');
+        $editor->setFirstName('Editor');
+        $editor->setLastName('User');
+        $editor->setEmailVerified(true);
+        $editor->setPassword($this->passwordHasher->hashPassword($editor, 'Editor123!'));
+        $editor->addRoleEntity($roles['editor']);
+        $manager->persist($editor);
+
+        // Create viewer user
+        $viewer = new User();
+        $viewer->setEmail('viewer@dmcc.local');
+        $viewer->setFirstName('Viewer');
+        $viewer->setLastName('User');
+        $viewer->setEmailVerified(true);
+        $viewer->setPassword($this->passwordHasher->hashPassword($viewer, 'Viewer123!'));
+        $viewer->addRoleEntity($roles['viewer']);
+        $manager->persist($viewer);
 
         // Create tags
         $tagDefinitions = [
@@ -364,6 +386,42 @@ class AppFixtures extends Fixture
         $genJob2->setErrorMessage('API rate limit exceeded. Please try again later.');
         $genJob2->setProcessingTimeMs(1200);
         $manager->persist($genJob2);
+
+        // Campaign team members
+        $member1 = new CampaignMember();
+        $member1->setCampaign($campaign1);
+        $member1->setUser($editor);
+        $member1->setRole('editor');
+        $manager->persist($member1);
+
+        $member2 = new CampaignMember();
+        $member2->setCampaign($campaign1);
+        $member2->setUser($viewer);
+        $member2->setRole('viewer');
+        $manager->persist($member2);
+
+        // Sample comments
+        $comment1 = new Comment();
+        $comment1->setEntityType('Campaign');
+        $comment1->setEntityId($campaign1->getId());
+        $comment1->setAuthor($admin);
+        $comment1->setBody('Campaign kickoff! Let\'s focus on the teaser video first.');
+        $manager->persist($comment1);
+
+        $comment2 = new Comment();
+        $comment2->setEntityType('Campaign');
+        $comment2->setEntityId($campaign1->getId());
+        $comment2->setAuthor($editor);
+        $comment2->setBody('Sounds good, I\'ll start working on the video script.');
+        $comment2->setParent($comment1);
+        $manager->persist($comment2);
+
+        $comment3 = new Comment();
+        $comment3->setEntityType('CampaignObject');
+        $comment3->setEntityId($obj1->getId());
+        $comment3->setAuthor($editor);
+        $comment3->setBody('The teaser video looks great! Ready for review.');
+        $manager->persist($comment3);
 
         // System settings
         $settingDefs = [

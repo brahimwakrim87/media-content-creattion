@@ -7,6 +7,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Entity\Campaign;
+use App\Entity\CampaignMember;
 use App\Entity\CampaignObject;
 use App\Entity\CampaignTarget;
 use App\Entity\GenerationJob;
@@ -53,26 +54,38 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         if ($resourceClass === Campaign::class) {
-            $queryBuilder->andWhere(sprintf('%s.owner = :current_user', $rootAlias))
+            $queryBuilder
+                ->leftJoin(CampaignMember::class, 'cue_cm', 'WITH', sprintf('cue_cm.campaign = %s.id AND cue_cm.user = :current_user', $rootAlias))
+                ->andWhere(sprintf('%s.owner = :current_user OR cue_cm.id IS NOT NULL', $rootAlias))
                 ->setParameter('current_user', $user);
         }
 
         if ($resourceClass === CampaignObject::class) {
-            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'campaign_owner_filter')
-                ->andWhere('campaign_owner_filter.owner = :current_user')
+            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'cue_co_campaign')
+                ->leftJoin(CampaignMember::class, 'cue_co_cm', 'WITH', 'cue_co_cm.campaign = cue_co_campaign.id AND cue_co_cm.user = :current_user')
+                ->andWhere('cue_co_campaign.owner = :current_user OR cue_co_cm.id IS NOT NULL')
                 ->setParameter('current_user', $user);
         }
 
         if ($resourceClass === CampaignTarget::class) {
-            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'ct_campaign')
-                ->andWhere('ct_campaign.owner = :current_user')
+            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'cue_ct_campaign')
+                ->leftJoin(CampaignMember::class, 'cue_ct_cm', 'WITH', 'cue_ct_cm.campaign = cue_ct_campaign.id AND cue_ct_cm.user = :current_user')
+                ->andWhere('cue_ct_campaign.owner = :current_user OR cue_ct_cm.id IS NOT NULL')
                 ->setParameter('current_user', $user);
         }
 
         if ($resourceClass === Publication::class) {
-            $queryBuilder->join(sprintf('%s.campaignObject', $rootAlias), 'pub_content')
-                ->join('pub_content.campaign', 'pub_campaign')
-                ->andWhere('pub_campaign.owner = :current_user')
+            $queryBuilder->join(sprintf('%s.campaignObject', $rootAlias), 'cue_pub_content')
+                ->join('cue_pub_content.campaign', 'cue_pub_campaign')
+                ->leftJoin(CampaignMember::class, 'cue_pub_cm', 'WITH', 'cue_pub_cm.campaign = cue_pub_campaign.id AND cue_pub_cm.user = :current_user')
+                ->andWhere('cue_pub_campaign.owner = :current_user OR cue_pub_cm.id IS NOT NULL')
+                ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === CampaignMember::class) {
+            $queryBuilder->join(sprintf('%s.campaign', $rootAlias), 'cue_mem_campaign')
+                ->leftJoin(CampaignMember::class, 'cue_mem_cm', 'WITH', 'cue_mem_cm.campaign = cue_mem_campaign.id AND cue_mem_cm.user = :current_user')
+                ->andWhere('cue_mem_campaign.owner = :current_user OR cue_mem_cm.id IS NOT NULL')
                 ->setParameter('current_user', $user);
         }
 

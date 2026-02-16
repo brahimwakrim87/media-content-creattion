@@ -41,4 +41,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @return User[]
+     */
+    public function searchByEmail(string $query, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.email LIKE :query')
+            ->andWhere('u.isActive = true')
+            ->setParameter('query', $query . '%')
+            ->setMaxResults($limit)
+            ->orderBy('u.email', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

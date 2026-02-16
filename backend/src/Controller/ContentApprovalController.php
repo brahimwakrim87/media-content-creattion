@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CampaignMember;
 use App\Entity\CampaignObject;
 use App\Message\SendNotification;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,8 +39,9 @@ class ContentApprovalController extends AbstractController
             throw $this->createNotFoundException('Content not found.');
         }
 
-        $owner = $content->getCampaign()?->getOwner();
-        if ($owner !== $user && !$this->isGranted('ROLE_ADMIN')) {
+        $campaign = $content->getCampaign();
+        $owner = $campaign?->getOwner();
+        if ($owner !== $user && !$campaign->canEdit($user) && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
         }
 
@@ -69,13 +71,45 @@ class ContentApprovalController extends AbstractController
             'request_changes' => 'Changes requested for content',
         };
 
-        $this->bus->dispatch(new SendNotification(
-            userId: $owner->getId()->toRfc4122(),
-            type: 'content',
-            title: $notifTitle,
-            message: $payload['comment'] ?? null,
-            data: ['contentId' => $id, 'action' => $action],
-        ));
+        $notifData = [
+            'contentId' => $id,
+            'campaignId' => $campaign->getId()->toRfc4122(),
+            'action' => $action,
+            'link' => '/dashboard/content/' . $id,
+        ];
+
+        // Notify campaign owner if the current user is not the owner
+        if ($owner !== $user) {
+            $this->bus->dispatch(new SendNotification(
+                userId: $owner->getId()->toRfc4122(),
+                type: 'content',
+                title: $notifTitle,
+                message: $payload['comment'] ?? null,
+                data: $notifData,
+            ));
+        }
+
+        // Notify team members based on action
+        $members = $this->em->getRepository(CampaignMember::class)->findBy(['campaign' => $campaign]);
+        foreach ($members as $member) {
+            $memberUser = $member->getUser();
+            if ($memberUser === $user) {
+                continue; // don't notify the actor
+            }
+
+            // For submit_review: only notify editors (they review content)
+            if ($action === 'submit_review' && $member->getRole() !== 'editor') {
+                continue;
+            }
+
+            $this->bus->dispatch(new SendNotification(
+                userId: $memberUser->getId()->toRfc4122(),
+                type: 'content',
+                title: $notifTitle,
+                message: $payload['comment'] ?? null,
+                data: $notifData,
+            ));
+        }
 
         return $this->json([
             'id' => $content->getId()->toRfc4122(),

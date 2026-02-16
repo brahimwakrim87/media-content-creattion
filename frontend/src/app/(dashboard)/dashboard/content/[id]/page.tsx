@@ -14,10 +14,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useContentItem, useUpdateContent, useDeleteContent, useContentTransition } from "@/lib/hooks/use-content";
+import { useContentActivity } from "@/lib/hooks/use-activity";
 import { StatusBadge } from "@/components/status-badge";
 import { MediaPreview } from "@/components/media-preview";
 import { MediaUpload } from "@/components/media-upload";
 import { GenerationProgress } from "@/components/generation-progress";
+import { CommentSection } from "@/components/comment-section";
+import { ActivityFeed } from "@/components/activity-feed";
 
 const typeIcons: Record<string, typeof Video> = {
   video: Video,
@@ -32,6 +35,7 @@ export default function ContentDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   const { data: item, isLoading, refetch } = useContentItem(id);
+  const { data: activityData, isLoading: activityLoading } = useContentActivity(id);
   const updateContent = useUpdateContent(id);
   const deleteContent = useDeleteContent();
   const transition = useContentTransition(id);
@@ -301,6 +305,12 @@ export default function ContentDetailPage() {
           Created: {new Date(item.createdAt).toLocaleString()} | Updated:{" "}
           {new Date(item.updatedAt).toLocaleString()}
         </div>
+      </div>
+
+      {/* Comments & Activity */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <CommentSection entityType="CampaignObject" entityId={id} />
+        <ActivityFeed items={activityData} isLoading={activityLoading} />
       </div>
 
       {/* Delete confirmation */}

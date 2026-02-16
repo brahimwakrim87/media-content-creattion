@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\CampaignRepository;
 use App\State\CampaignProcessor;
+use App\Entity\CampaignMember;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => ['campaign:read', 'campaign:item:read']],
-            security: "is_granted('ROLE_USER') and object.getOwner() == user",
+            security: "is_granted('ROLE_USER') and object.hasAccess(user)",
         ),
         new GetCollection(
             normalizationContext: ['groups' => ['campaign:read']],
@@ -41,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             normalizationContext: ['groups' => ['campaign:read']],
             denormalizationContext: ['groups' => ['campaign:update']],
-            security: "is_granted('ROLE_USER') and object.getOwner() == user",
+            security: "is_granted('ROLE_USER') and object.canEdit(user)",
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getOwner() == user",
@@ -115,6 +116,11 @@ class Campaign
     #[Groups(['campaign:item:read'])]
     private Collection $campaignTargets;
 
+    /** @var Collection<int, CampaignMember> */
+    #[ORM\OneToMany(targetEntity: CampaignMember::class, mappedBy: 'campaign', cascade: ['persist', 'remove'])]
+    #[Groups(['campaign:item:read'])]
+    private Collection $members;
+
     /** @var Collection<int, Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'campaigns')]
     #[ORM\JoinTable(name: 'campaign_tag')]
@@ -127,6 +133,7 @@ class Campaign
         $this->updatedAt = new \DateTimeImmutable();
         $this->campaignObjects = new ArrayCollection();
         $this->campaignTargets = new ArrayCollection();
+        $this->members = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
 
@@ -287,6 +294,61 @@ class Campaign
             }
         }
         return $this;
+    }
+
+    /** @return Collection<int, CampaignMember> */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(CampaignMember $member): static
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+            $member->setCampaign($this);
+        }
+        return $this;
+    }
+
+    public function removeMember(CampaignMember $member): static
+    {
+        if ($this->members->removeElement($member)) {
+            if ($member->getCampaign() === $this) {
+                $member->setCampaign(null);
+            }
+        }
+        return $this;
+    }
+
+    public function isTeamMember(User $user): bool
+    {
+        foreach ($this->members as $member) {
+            if ($member->getUser() === $user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getMemberRole(User $user): ?string
+    {
+        foreach ($this->members as $member) {
+            if ($member->getUser() === $user) {
+                return $member->getRole();
+            }
+        }
+        return null;
+    }
+
+    public function hasAccess(User $user): bool
+    {
+        return $this->owner === $user || $this->isTeamMember($user);
+    }
+
+    public function canEdit(User $user): bool
+    {
+        return $this->owner === $user || $this->getMemberRole($user) === 'editor';
     }
 
     /** @return Collection<int, Tag> */

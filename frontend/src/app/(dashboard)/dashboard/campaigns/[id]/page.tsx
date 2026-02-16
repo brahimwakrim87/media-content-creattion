@@ -15,10 +15,19 @@ import {
   Image,
   Newspaper,
   Megaphone,
+  MessageSquare,
+  Clock,
+  Users,
 } from "lucide-react";
 import { useCampaign, useDeleteCampaign } from "@/lib/hooks/use-campaigns";
 import { useCampaignContent } from "@/lib/hooks/use-content";
+import { useCampaignActivity } from "@/lib/hooks/use-activity";
+import { useAuthStore } from "@/lib/auth";
 import { StatusBadge } from "@/components/status-badge";
+import { TeamMembersPanel } from "@/components/team-members-panel";
+import { CommentSection } from "@/components/comment-section";
+import { ActivityFeed } from "@/components/activity-feed";
+import { cn } from "@/lib/utils";
 
 const typeIcons: Record<string, typeof Video> = {
   video: Video,
@@ -28,14 +37,19 @@ const typeIcons: Record<string, typeof Video> = {
   advertisement: Megaphone,
 };
 
+type TabKey = "activity" | "comments" | "team";
+
 export default function CampaignDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
   const { data: campaign, isLoading } = useCampaign(id);
   const { data: contentData } = useCampaignContent(id);
+  const { data: activityData, isLoading: activityLoading } = useCampaignActivity(id);
   const deleteCampaign = useDeleteCampaign();
+  const user = useAuthStore((s) => s.user);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>("activity");
 
   const content = contentData?.member ?? [];
 
@@ -192,6 +206,49 @@ export default function CampaignDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Collaboration tabs */}
+      {campaign && (
+        <div className="mt-6">
+          <div className="flex border-b">
+            {(
+              [
+                { key: "activity" as TabKey, label: "Activity", icon: Clock },
+                { key: "comments" as TabKey, label: "Comments", icon: MessageSquare },
+                { key: "team" as TabKey, label: "Team", icon: Users },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+                  activeTab === tab.key
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                )}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <div className="mt-4">
+            {activeTab === "activity" && (
+              <ActivityFeed items={activityData} isLoading={activityLoading} />
+            )}
+            {activeTab === "comments" && (
+              <CommentSection entityType="Campaign" entityId={id} />
+            )}
+            {activeTab === "team" && (
+              <TeamMembersPanel
+                campaignId={id}
+                isOwner={campaign.owner.id === user?.id}
+              />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (

@@ -45,26 +45,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'comment:read', 'member:read'])]
     private ?Uuid $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['user:read', 'user:update', 'comment:read', 'member:read'])]
     private ?string $email = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::STRING, length: 100)]
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['user:read', 'user:update', 'comment:read', 'member:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: Types::STRING, length: 100)]
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['user:read', 'user:update', 'comment:read', 'member:read'])]
     private ?string $lastName = null;
 
     #[ORM\Column(type: Types::STRING, length: 500, nullable: true)]
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['user:read', 'user:update', 'comment:read', 'member:read'])]
     private ?string $avatarUrl = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]

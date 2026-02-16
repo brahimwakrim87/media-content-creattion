@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => ['publication:read', 'publication:item:read']],
-            security: "is_granted('ROLE_USER') and object.getCampaignObject().getCampaign().getOwner() == user",
+            security: "is_granted('ROLE_USER') and object.getCampaignObject().getCampaign().hasAccess(user)",
         ),
         new GetCollection(
             normalizationContext: ['groups' => ['publication:read']],
@@ -39,7 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             normalizationContext: ['groups' => ['publication:read']],
             denormalizationContext: ['groups' => ['publication:update']],
-            security: "is_granted('ROLE_USER') and object.getCampaignObject().getCampaign().getOwner() == user",
+            security: "is_granted('ROLE_USER') and object.getCampaignObject().getCampaign().canEdit(user)",
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getCampaignObject().getCampaign().getOwner() == user",
