@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -50,6 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 20,
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
+#[ApiFilter(DateFilter::class, properties: ['startDate', 'endDate'])]
 class Campaign
 {
     #[ORM\Id]

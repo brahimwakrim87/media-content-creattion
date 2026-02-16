@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -48,6 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 20,
 )]
 #[ApiFilter(SearchFilter::class, properties: ['platform' => 'exact'])]
+#[ApiFilter(DateFilter::class, properties: ['scheduledAt', 'publishedAt'])]
 class Publication
 {
     #[ORM\Id]

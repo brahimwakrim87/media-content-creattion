@@ -21,6 +21,11 @@ final class PublicationProcessor implements ProcessorInterface
             $data->setPlatform($data->getSocialAccount()->getPlatform());
         }
 
+        // Auto-set status to 'scheduled' when scheduledAt is provided on create
+        if ($data instanceof Publication && !$data->getId() && $data->getScheduledAt() !== null) {
+            $data->setStatus('scheduled');
+        }
+
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }
 }

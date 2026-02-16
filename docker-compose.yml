@@ -126,6 +126,27 @@ services:
     networks:
       - dmcc
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    command: >
+      sh -c 'while true; do
+        php /var/www/backend/bin/console app:process-scheduled-publications --no-interaction 2>&1;
+        sleep 60;
+      done'
+    volumes:
+      - ./backend:/var/www/backend
+    env_file: .env.docker
+    healthcheck:
+      disable: true
+    depends_on:
+      php-fpm:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - dmcc
+
   certbot:
     image: certbot/certbot:latest
     volumes:

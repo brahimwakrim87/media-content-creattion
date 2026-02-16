@@ -23,6 +23,14 @@ services:
           cpus: "0.50"
           memory: 256M
 
+  scheduler:
+    env_file: .env.prod
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
   next-app:
     deploy:
       resources:

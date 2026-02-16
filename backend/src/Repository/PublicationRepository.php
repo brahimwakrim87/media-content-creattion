@@ -17,6 +17,43 @@ class PublicationRepository extends ServiceEntityRepository
         parent::__construct($registry, Publication::class);
     }
 
+    /**
+     * @return Publication[]
+     */
+    public function findForCalendar(User $owner, \DateTimeImmutable $from, \DateTimeImmutable $to, int $limit = 200): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.campaignObject', 'co')
+            ->join('co.campaign', 'c')
+            ->andWhere('c.owner = :owner')
+            ->andWhere(
+                '(p.scheduledAt BETWEEN :from AND :to) OR (p.publishedAt BETWEEN :from AND :to)'
+            )
+            ->setParameter('owner', $owner)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('p.scheduledAt', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Publication[]
+     */
+    public function findDueForPublishing(int $limit = 50): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.scheduledAt <= :now')
+            ->setParameter('status', 'scheduled')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('p.scheduledAt', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function countForUser(User $owner): int
     {
         return (int) $this->createQueryBuilder('p')

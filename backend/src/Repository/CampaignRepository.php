@@ -20,6 +20,26 @@ class CampaignRepository extends ServiceEntityRepository
     /**
      * @return Campaign[]
      */
+    public function findForCalendar(User $owner, \DateTimeImmutable $from, \DateTimeImmutable $to): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.owner = :owner')
+            ->andWhere(
+                '(c.startDate <= :to AND c.endDate >= :from) OR ' .
+                '(c.startDate BETWEEN :from AND :to) OR ' .
+                '(c.endDate BETWEEN :from AND :to)'
+            )
+            ->setParameter('owner', $owner)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('c.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Campaign[]
+     */
     public function findByOwnerAndStatus(User $owner, ?string $status = null): array
     {
         $qb = $this->createQueryBuilder('c')
